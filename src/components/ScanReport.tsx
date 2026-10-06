@@ -16,8 +16,9 @@ interface Row {
 const toneText = { critical: 'text-critical', warning: 'text-warning', cleanup: 'text-cleanup' }
 
 /** Shows the work behind the score: every check that ran, and every token that was looked at. */
-export function ScanReport({ data, findings }: { data: ScanResult; findings: Finding[] }) {
+export function ScanReport({ data, findings, defaultOpen = true }: { data: ScanResult; findings: Finding[]; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(defaultOpen)
   const permissions = findings.filter((f) => f.delegate && (f.type === 'delegation' || f.type === 'scam_match'))
   const spam = findings.filter((f) => f.type === 'suspicious' || (f.type === 'scam_match' && !f.delegate))
   const empty = findings.filter((f) => f.type === 'empty')
@@ -29,45 +30,50 @@ export function ScanReport({ data, findings }: { data: ScanResult; findings: Fin
 
   const rows: Row[] = [
     {
-      label: 'App permissions',
+      label: 'App access',
       ok: !permissions.length,
       okText: 'No app can move your tokens',
-      badText: `${plural(permissions.length, 'app')} can move your tokens`,
+      badText: `${plural(permissions.length, 'app')} can still move your tokens`,
       tone: permissions.some((f) => f.severity === 'critical') ? 'critical' : 'warning',
     },
     {
-      label: 'Spam and fake tokens',
+      label: 'Fake and spam tokens',
       ok: !spam.length,
       okText: 'None found',
-      badText: `${plural(spam.length, 'suspicious token')} found`,
+      badText: `${plural(spam.length, 'fake token')} sent to you`,
       tone: 'warning',
     },
     {
-      label: 'Empty accounts',
+      label: 'Old empty accounts',
       ok: !empty.length,
       okText: 'None, no SOL is stuck',
-      badText: `${plural(empty.length, 'empty account')} holding ${sol(emptyRent)} you can get back`,
+      badText: `${plural(empty.length, 'account')} holding ${sol(emptyRent)} you can get back`,
       tone: 'cleanup',
     },
     {
       label: 'Known scam addresses',
       ok: !scamLinks.length,
       okText: 'No links found',
-      badText: `${plural(scamLinks.length, 'link')} found`,
+      badText: `Linked to ${plural(scamLinks.length, 'known scammer')}`,
       tone: 'critical',
     },
   ]
 
   return (
     <div className="rounded-card border border-border bg-surface-1">
-      <div className="px-4 pb-2 pt-4">
-        <h2 className="text-body font-medium">What Shield checked</h2>
-        <p className="mt-1 text-body-sm text-text-secondary">
-          {plural(n, 'token account')} and your SOL balance, read live from Solana
-          {data.durationMs ? ` in ${(data.durationMs / 1000).toFixed(1)} s` : ''}.
-        </p>
-      </div>
+      <button onClick={() => setExpanded((e) => !e)} aria-expanded={expanded} className="flex w-full items-start gap-3 px-4 pb-2 pt-4 text-left">
+        <div className="flex-1">
+          <h2 className="text-body font-medium">What Shield checked</h2>
+          <p className="mt-1 text-body-sm text-text-secondary">
+            {plural(n, 'token account')} and your SOL balance, read live from Solana
+            {data.durationMs ? ` in ${(data.durationMs / 1000).toFixed(1)} s` : ''}.
+          </p>
+        </div>
+        <ChevronDown size={18} className={cn('mt-1 shrink-0 text-text-muted transition-transform duration-fast', expanded && 'rotate-180')} aria-hidden />
+      </button>
 
+      {expanded && (
+      <>
       <ul className="divide-y divide-border">
         {rows.map((r) => (
           <li key={r.label} className="flex items-start gap-3 px-4 py-3">
@@ -130,6 +136,9 @@ export function ScanReport({ data, findings }: { data: ScanResult; findings: Fin
           )}
         </div>
       )}
+      </>
+      )}
+      {!expanded && <div className="pb-2" />}
     </div>
   )
 }

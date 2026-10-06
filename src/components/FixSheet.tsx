@@ -33,7 +33,7 @@ async function recordFix(owner: string, signature: string) {
 const PLAN_MAX_AGE_MS = 45_000
 
 /** The plain-English summary sheet shown before every fingerprint prompt (CLAUDE.md safety rule). */
-export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; onClose: () => void; onDone: (r: FixResult) => void }) {
+export function FixSheet({ items, onClose, onDone, onAlerts }: { items: FixItem[] | null; onClose: () => void; onDone: (r: FixResult) => void; onAlerts?: () => void }) {
   const { connection } = useConnection()
   const { publicKey, signAllTransactions, sendTransaction } = useWallet()
   const [step, setStep] = useState<Step>('planning')
@@ -119,10 +119,10 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
   }
 
   return (
-    <Sheet open={!!items} onClose={close} title={step === 'done' ? 'Done' : 'Review the fix'}>
+    <Sheet open={!!items} onClose={close} title={step === 'done' ? 'Done' : 'Here’s what will change'}>
       {step === 'planning' && (
         <div className="flex items-center gap-3 py-6 text-body-sm text-text-secondary">
-          <Spinner /> Preparing and test-running the transaction…
+          <Spinner /> Test-running the fix on the network first…
         </div>
       )}
 
@@ -151,13 +151,13 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
             </div>
           )}
           <p className="text-caption text-text-muted">
-            Every change was test-run on the network first. Network fee about {sol(plan.feeLamports)}.
+            We test-ran this on the network and it works. Network fee about {sol(plan.feeLamports)}.
             {plan.ready.length > 1 ? ` ${plan.ready.length} transactions.` : ''} Your tokens are not moved.
           </p>
           {/* Sign button only exists when at least one transaction passed simulation. */}
           {plan.ready.length > 0 ? (
             <Button className="w-full" onClick={confirm}>
-              <Fingerprint size={20} aria-hidden /> Confirm with fingerprint
+              <Fingerprint size={20} aria-hidden /> Approve with fingerprint
             </Button>
           ) : (
             <Button className="w-full" variant="secondary" onClick={close}>
@@ -170,7 +170,7 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
       {(step === 'signing' || step === 'sending') && (
         <div className="flex items-center gap-3 py-6 text-body-sm text-text-secondary">
           <Spinner />
-          {step === 'signing' ? 'Approve in your wallet…' : `Confirming on the network… ${progress.done}/${progress.total}`}
+          {step === 'signing' ? 'Approve in Seed Vault with your fingerprint…' : `Confirming on the network… ${progress.done}/${progress.total}`}
         </div>
       )}
 
@@ -178,12 +178,30 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
         <div className="space-y-4 py-2">
           <div className="flex items-center gap-3 text-safe">
             <Check size={24} aria-hidden />
-            <p className="text-body font-medium">Fixed {result.current.fixedIds.length} item{result.current.fixedIds.length === 1 ? '' : 's'}.</p>
+            <p className="text-body font-medium">Fixed {result.current.fixedIds.length} issue{result.current.fixedIds.length === 1 ? '' : 's'}.</p>
           </div>
           {result.current.reclaimedLamports > 0 && <p className="text-body-sm text-text-secondary">{sol(result.current.reclaimedLamports)} is back in your wallet.</p>}
-          <Button className="w-full" onClick={close}>
-            Done
-          </Button>
+          {onAlerts ? (
+            <>
+              <p className="text-body-sm text-text-secondary">Want a heads-up if something like this happens again?</p>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  close()
+                  onAlerts()
+                }}
+              >
+                Turn on alerts
+              </Button>
+              <Button className="w-full" variant="ghost" onClick={close}>
+                Not now
+              </Button>
+            </>
+          ) : (
+            <Button className="w-full" onClick={close}>
+              Done
+            </Button>
+          )}
         </div>
       )}
 
@@ -205,5 +223,5 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
 }
 
 function actionLabel(i: FixItem) {
-  return i.action === 'revoke' ? 'Revoke permission on' : i.action === 'close' ? 'Close empty' : 'Burn and close'
+  return i.action === 'revoke' ? 'Remove app access to' : i.action === 'close' ? 'Close old empty' : 'Destroy'
 }

@@ -7,10 +7,10 @@ import { getWatched, isPro, pushAlert, watchersOf, type Alert } from './watch.js
 import type { Finding } from './types.js'
 
 const TITLES: Record<Finding['type'], (f: Finding) => string> = {
-  delegation: (f) => `An app can now move ${f.symbol || 'a token'}`,
-  scam_match: () => 'Linked to a known scam address',
-  suspicious: (f) => `New suspicious token: ${(f.symbol || 'unknown').slice(0, 16)}`,
-  empty: () => 'Empty account',
+  delegation: (f) => `An app now has access to your ${f.symbol || 'tokens'}`,
+  scam_match: () => 'Linked to a known scammer',
+  suspicious: () => 'Someone sent you a fake token',
+  empty: () => 'Old empty account',
 }
 
 const appLink = (watcher: string, wallet: string) => (env.appUrl ? `${env.appUrl}/${wallet === watcher ? '' : `?check=${wallet}`}` : '')

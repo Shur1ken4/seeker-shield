@@ -12,9 +12,10 @@ const styles: Record<ChipKind, string> = {
 }
 
 const labels: Record<ChipKind, string> = {
-  critical: 'Critical',
-  warning: 'Warning',
-  cleanup: 'Cleanup',
+  // Same words as the group headings on the Scan tab: what to do, not just how bad.
+  critical: 'Fix now',
+  warning: 'Check this',
+  cleanup: 'Tidy up',
   suspicious: 'Suspicious',
   safe: 'Safe',
 }

@@ -27,9 +27,9 @@ export function WatchPage({ onGoToScan, onUpgrade }: { onGoToScan: () => void; o
     <section className="space-y-6 pt-2">
       <header>
         <h1 className="text-heading font-semibold">Watch</h1>
-        <p className="mt-1 text-body-sm text-text-secondary">Get a Telegram alert when something risky lands in your wallet or a friend’s.</p>
+        <p className="mt-1 text-body-sm text-text-secondary">Shield keeps checking after you leave. If a fake token or new app access shows up in your wallet or a friend’s, you get a Telegram message.</p>
       </header>
-      <VerifyGate why="Alerts are tied to your wallet." onGoToScan={onGoToScan}>
+      <VerifyGate why="So alerts go to you and nobody else." onGoToScan={onGoToScan}>
         <WatchContent onUpgrade={onUpgrade} />
       </VerifyGate>
     </section>

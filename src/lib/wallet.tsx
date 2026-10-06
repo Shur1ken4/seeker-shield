@@ -112,10 +112,11 @@ export function friendlyWalletError(e: unknown): string {
   const msg = String((e as Error)?.message ?? e)
   // Keep the raw error in the console for debugging; the user sees the plain-English version.
   console.error('[wallet]', (e as Error)?.name, msg, (e as { error?: unknown })?.error ?? '')
-  if (/local network access/i.test(msg)) return 'Allow “local network access” when Chrome asks; the wallet needs it to connect.'
-  if (/reject|declin|cancel|denied/i.test(msg)) return 'You cancelled in the wallet. Nothing was changed.'
-  if (/not found|no wallet/i.test(msg)) return 'No wallet app found. Open Seeker Shield on your Seeker.'
-  return 'The wallet didn’t respond. Please try again.'
+  if (/local network access/i.test(msg)) return 'Chrome blocked the connection to your wallet. Tap the icon left of the address bar, allow “Apps on device”, then try again.'
+  if (/reject|declin|cancel|denied/i.test(msg)) return 'You cancelled in your wallet, so nothing changed. Tap again whenever you’re ready.'
+  if (/not found|no wallet/i.test(msg)) return 'No wallet app found. Open Seeker Shield in Chrome on an Android phone with Seed Vault, Phantom or Solflare.'
+  if (/timed out/i.test(msg)) return 'Your wallet didn’t open in time. Make sure you’re using Chrome, then tap again.'
+  return 'Your wallet didn’t respond. Make sure you’re using Chrome, then tap again.'
 }
 
 // ---------- Seeker Verified session ----------

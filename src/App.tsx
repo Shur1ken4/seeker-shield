@@ -22,7 +22,7 @@ export function App() {
         <main className="px-4 pb-[calc(88px+env(safe-area-inset-bottom))]">
           {/* Scan stays mounted so switching tabs doesn't throw away a scan. */}
           <div hidden={tab !== 'scan'}>
-            <ScanPage onFixed={bump} />
+            <ScanPage onFixed={bump} onGoToWatch={() => setTab('watch')} />
           </div>
           {tab === 'watch' && <WatchPage onGoToScan={goScan} onUpgrade={upgrade} key={refreshKey} />}
           {tab === 'profile' && <ProfilePage onGoToScan={goScan} onUpgrade={upgrade} refreshKey={refreshKey} />}

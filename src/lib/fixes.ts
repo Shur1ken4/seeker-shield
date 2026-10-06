@@ -147,9 +147,9 @@ export async function planFixes(connection: Connection, owner: PublicKey, items:
 /** Plain-English one-liner for the summary sheet. */
 export function describePlan(p: Pick<FixPlan, 'revokes' | 'closes' | 'burns'>) {
   const parts: string[] = []
-  if (p.revokes) parts.push(`revoke ${p.revokes} permission${p.revokes > 1 ? 's' : ''}`)
-  if (p.closes) parts.push(`close ${p.closes} empty account${p.closes > 1 ? 's' : ''}`)
-  if (p.burns) parts.push(`permanently burn ${p.burns} token${p.burns > 1 ? 's' : ''}`)
+  if (p.revokes) parts.push(`remove ${p.revokes} app${p.revokes > 1 ? 's’' : '’s'} access to your tokens`)
+  if (p.closes) parts.push(`close ${p.closes} old empty account${p.closes > 1 ? 's' : ''}`)
+  if (p.burns) parts.push(`permanently destroy ${p.burns} fake token${p.burns > 1 ? 's' : ''}`)
   if (!parts.length) return 'Nothing to change.'
   const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts[0]
   return `This will ${list}.`

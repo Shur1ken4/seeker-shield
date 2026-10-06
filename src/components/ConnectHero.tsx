@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShieldCheck } from 'lucide-react'
+import { Fingerprint, MessageSquareText, ScanSearch, ShieldCheck } from 'lucide-react'
 import { useConnectWallet } from '@/lib/wallet'
 import { Button } from './Button'
 import { Sheet } from './Sheet'
@@ -20,23 +20,44 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
     <section className="space-y-8 pt-8">
       <div className="space-y-3">
         <ShieldCheck size={40} strokeWidth={1.5} className="text-safe" aria-hidden />
-        <h1 className="text-heading font-semibold">Your keys are safe. Are your approvals?</h1>
+        <h1 className="text-heading font-semibold">Your keys are safe. Is your wallet?</h1>
         <p className="text-body text-text-secondary">
-          Seeker Shield checks your wallet for risky permissions, spam tokens and clutter, explains each one in plain English, and fixes it with one fingerprint.
+          Shield checks your wallet for the 3 things drainers use, explains each one in plain English, and fixes it with your fingerprint.
         </p>
       </div>
+
+      <ol className="space-y-3">
+        {[
+          { icon: ScanSearch, title: 'Scan', text: 'See what can touch your tokens.' },
+          { icon: MessageSquareText, title: 'Understand', text: 'One plain sentence per problem.' },
+          { icon: Fingerprint, title: 'Fix', text: 'One tap, one fingerprint.' },
+        ].map(({ icon: Icon, title, text }, i) => (
+          <li key={title} className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-safe/[.14] text-safe">
+              <Icon size={20} aria-hidden />
+            </span>
+            <p className="text-body-sm">
+              <span className="font-medium text-text-primary">
+                {i + 1}. {title}:
+              </span>{' '}
+              <span className="text-text-secondary">{text}</span>
+            </p>
+          </li>
+        ))}
+      </ol>
+
       <div className="space-y-3">
         <Button className="w-full" onClick={onConnect} loading={connecting}>
-          Connect wallet
+          Scan my wallet
         </Button>
         {error && <p className="text-body-sm text-critical">{error}</p>}
-        <p className="text-caption text-text-muted">Scanning is read-only. Nothing is signed until you tap a fix.</p>
+        <p className="text-caption text-text-muted">Free and read-only. Shield can’t move your funds, and never asks for your seed phrase.</p>
       </div>
 
       <div>
         {!showLookup ? (
           <button className="min-h-tap text-body-sm text-text-secondary underline underline-offset-4" onClick={() => setShowLookup(true)}>
-            Check any address instead
+            Check a friend’s wallet instead
           </button>
         ) : (
           <form
@@ -47,7 +68,7 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
             }}
           >
             <label htmlFor="lookup" className="text-body-sm text-text-secondary">
-              Wallet address
+              Their Solana wallet address (read-only)
             </label>
             <input
               id="lookup"
@@ -60,7 +81,7 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
               className="min-h-tap w-full rounded-card border border-border bg-surface-2 px-3 font-mono text-body-sm text-text-primary placeholder:text-text-muted focus:border-safe focus:outline-none"
             />
             <Button type="submit" variant="secondary" className="w-full" disabled={!validAddr}>
-              Check address
+              Check this wallet
             </Button>
           </form>
         )}
@@ -86,7 +107,7 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
           </ul>
         ) : (
           <p className="text-body-sm text-text-secondary">
-            No wallet found here. Open Seeker Shield on your Seeker (in the app or in Chrome) to connect the Seed Vault Wallet.
+            No wallet app found on this device. Open Seeker Shield on your Seeker or another Android phone, in the app or in Chrome, to connect your wallet.
           </p>
         )}
       </Sheet>

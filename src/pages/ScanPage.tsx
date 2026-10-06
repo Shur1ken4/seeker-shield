@@ -21,13 +21,23 @@ import { blockReason, defaultAction } from '../../api/_lib/guard'
 import { computeScore } from '../../api/_lib/score'
 import type { Finding, Severity } from '../../api/_lib/types'
 
-const GROUPS: { severity: Severity; label: string }[] = [
-  { severity: 'critical', label: 'Critical' },
-  { severity: 'warning', label: 'Warning' },
-  { severity: 'cleanup', label: 'Cleanup' },
+// Grouped by what to do, not just how bad it is (the coloured chips still carry severity).
+const GROUPS: { severity: Severity; label: string; hint: string }[] = [
+  { severity: 'critical', label: 'Fix now', hint: 'Could lose you money' },
+  { severity: 'warning', label: 'Check this', hint: 'Worth a look' },
+  { severity: 'cleanup', label: 'Tidy up', hint: 'Harmless, and gives SOL back' },
 ]
 
-export function ScanPage({ onFixed }: { onFixed?: () => void }) {
+function summaryLine(findings: Finding[], readOnly: boolean) {
+  if (!findings.length) return 'Nothing can drain this wallet right now.'
+  const urgent = findings.filter((f) => f.severity !== 'cleanup').length
+  const tidy = findings.length - urgent
+  const accounts = `${tidy} old account${tidy === 1 ? '' : 's'} holding SOL`
+  if (!urgent) return readOnly ? `Safe, with ${accounts} the owner can get back.` : `Safe, with ${accounts} you can get back.`
+  return `${urgent} thing${urgent === 1 ? ' needs' : 's need'} ${readOnly ? 'attention' : 'your attention'}${tidy ? `, plus ${tidy} to tidy up` : ''}.`
+}
+
+export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoToWatch?: () => void }) {
   const { publicKey, disconnect } = useWallet()
   // ?check=<address> opens a read-only scan (used by Telegram alert links for friends' wallets).
   const [lookup, setLookup] = useState<string | null>(() => {
@@ -62,11 +72,11 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
     const canBurn = !readOnly && !blockReason(f, 'burn', { burnConfirmed: true })
     const secondary: FindingAction[] = []
     if (f.type === 'suspicious' || (f.type === 'scam_match' && !f.delegate)) {
-      if (canBurn) secondary.push({ label: 'Burn', onClick: () => setBurnTarget(f), variant: 'ghost' })
+      if (canBurn) secondary.push({ label: 'Destroy', onClick: () => setBurnTarget(f), variant: 'ghost' })
       return { primary: { label: 'Hide', variant: 'secondary', onClick: () => hide(f.mint) }, secondary }
     }
     if (readOnly || !act || blockReason(f, act)) return {}
-    return { primary: { label: act === 'revoke' ? 'Revoke' : 'Close', onClick: () => setFixItems([{ finding: f, action: act }]) } }
+    return { primary: { label: act === 'revoke' ? 'Remove access' : 'Get SOL back', onClick: () => setFixItems([{ finding: f, action: act }]) } }
   }
 
   return (
@@ -95,7 +105,10 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
           </div>
         </div>
       ) : data ? (
-        <ScoreDial score={score} />
+        <div className="space-y-3">
+          <ScoreDial score={score} />
+          <p className="text-body text-text-primary">{summaryLine(visible, readOnly)}</p>
+        </div>
       ) : null}
 
       {error && !loading && (
@@ -105,19 +118,18 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
       {data && !readOnly && fixAll.length > 0 && (
         <div className="space-y-2">
           <Button className="w-full" onClick={() => setFixItems(fixAll)}>
-            Fix all safe items ({fixAll.length})
+            Fix {fixAll.length} issue{fixAll.length === 1 ? '' : 's'}
           </Button>
           <p className="text-caption text-text-muted">
-            Revokes permissions and closes empty accounts{fixAllReclaim > 0 ? `, returning about ${sol(fixAllReclaim)}` : ''}. Never burns anything.
+            {fixAll.some((i) => i.action === 'revoke') ? 'Removes app access' : 'Closes old accounts'}
+            {fixAllReclaim > 0 ? ` and returns about ${sol(fixAllReclaim)} to you` : ''}. Your tokens don’t move.
           </p>
         </div>
       )}
 
       {data && readOnly && visible.length > 0 && (
-        <p className="rounded-chip bg-surface-1 p-3 text-body-sm text-text-secondary">This is a read-only check. Connect this wallet on its phone to fix these.</p>
+        <p className="rounded-chip bg-surface-1 p-3 text-body-sm text-text-secondary">You’re viewing someone else’s wallet. Only its owner can fix these, from their own phone.</p>
       )}
-
-      {data && <ScanReport data={data} findings={visible} />}
 
       {loading && !data && (
         <div className="space-y-3">
@@ -131,8 +143,16 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
         <EmptyState
           icon={<ShieldCheck size={28} aria-hidden />}
           title="You’re all clear"
-          body="Nothing needs fixing. Turn on alerts in Watch and Shield will tell you if that changes."
-          action={<Button variant="secondary" onClick={rescan} loading={loading}>Scan again</Button>}
+          body={readOnly ? 'Nothing in this wallet needs fixing right now.' : 'Nothing needs fixing. Turn on alerts and Shield will tell you if that changes.'}
+          action={
+            !readOnly && onGoToWatch ? (
+              <Button onClick={onGoToWatch}>Turn on alerts</Button>
+            ) : (
+              <Button variant="secondary" onClick={rescan} loading={loading}>
+                Scan again
+              </Button>
+            )
+          }
         />
       )}
 
@@ -143,6 +163,7 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
           <div key={severity} className="space-y-3">
             <h2 className="flex items-baseline gap-2 text-body-sm font-medium text-text-secondary">
               {label} <span className="text-caption text-text-muted">{items.length}</span>
+              <span className="ml-auto text-caption font-normal text-text-muted">{GROUPS.find((g) => g.severity === severity)!.hint}</span>
             </h2>
             {items.map((f) => {
               const { primary, secondary } = actionsFor(f)
@@ -151,6 +172,9 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
           </div>
         )
       })}
+
+      {/* The work behind the score: open on a clean wallet, tucked below the problems otherwise. */}
+      {data && <ScanReport data={data} findings={visible} defaultOpen={visible.length === 0} />}
 
       {data && (
         <div className="flex items-center justify-between text-caption text-text-muted">
@@ -186,8 +210,9 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
       <FixSheet
         items={fixItems}
         onClose={() => setFixItems(null)}
+        onAlerts={onGoToWatch}
         onDone={(r) => {
-          toast('success', r.reclaimedLamports > 0 ? `Fixed. ${sol(r.reclaimedLamports)} reclaimed.` : 'Fixed. Your wallet is safer.')
+          toast('success', r.reclaimedLamports > 0 ? `Done. ${sol(r.reclaimedLamports)} is back in your wallet.` : 'Done. Your wallet is safer.')
           // Update the score now; markFixed also re-checks the chain a few times in the background.
           markFixed(r.fixedIds)
           if (owner) addLocalStats(owner, { fixed: r.fixedIds.length, reclaimedLamports: r.reclaimedLamports })

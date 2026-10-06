@@ -15,10 +15,10 @@ const border: Record<Finding['severity'], string> = {
 }
 
 const title: Record<Finding['type'], (f: Finding) => string> = {
-  delegation: (f) => `${label(f)} can be moved by an app`,
-  scam_match: (f) => (f.delegate ? `${label(f)} can be moved by a listed address` : `${label(f)} is on the scam list`),
-  suspicious: (f) => `${label(f)} looks like spam`,
-  empty: (f) => `Empty ${label(f)} account`,
+  delegation: (f) => `An app can still move your ${label(f)}`,
+  scam_match: (f) => (f.delegate ? `A known scammer can move your ${label(f)}` : `Linked to a known scammer: ${label(f)}`),
+  suspicious: () => 'Someone sent you a fake token',
+  empty: (f) => `Old ${label(f)} account is holding your SOL`,
 }
 
 function label(f: Finding) {
@@ -53,10 +53,10 @@ export function FindingCard({
     ['Mint', finding.mint],
     ['Program', String(finding.raw.program ?? finding.programId)],
     ['Balance', `${amount(finding.uiAmount)}${finding.usdValue ? ` (${usd(finding.usdValue)})` : ''}`],
-    ...(finding.delegate ? ([['Permission holder (delegate)', finding.delegate], ['Allowed amount', finding.delegatedAmount ?? '—']] as [string, string][]) : []),
-    ['Rent locked', sol(finding.rentLamports)],
+    ...(finding.delegate ? ([['Who has access (delegate)', finding.delegate], ['Amount they can move', finding.delegatedAmount ?? '—']] as [string, string][]) : []),
+    ['SOL held as rent', sol(finding.rentLamports)],
     ['Why flagged', finding.reasons.join('; ')],
-    ...(finding.name && finding.name !== finding.symbol ? ([['Full name (untrusted)', finding.name]] as [string, string][]) : []),
+    ...(finding.name && finding.name !== finding.symbol ? ([['Token name (set by the sender, untrusted)', finding.name]] as [string, string][]) : []),
   ]
 
   return (

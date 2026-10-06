@@ -53,7 +53,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
         ) : (
           <div className="pt-2">
             <Button size="sm" variant="secondary" onClick={() => signIn().catch((e) => setError(e.message))} loading={signingIn}>
-              <BadgeCheck size={16} aria-hidden /> Verify my Seeker
+              <BadgeCheck size={16} aria-hidden /> Verify my Seeker (free)
             </Button>
             {error && <p className="mt-2 text-body-sm text-critical">{error}</p>}
           </div>
