@@ -43,7 +43,7 @@ export function WalletProviders({ children }: { children: ReactNode }) {
   const [autoConnect] = useState(() => flag())
   return (
     <ConnectionProvider endpoint={endpoint} config={{ commitment: 'confirmed', disableRetryOnRateLimit: true }}>
-      <WalletProvider wallets={[]} autoConnect={autoConnect} onError={() => {}}>
+      <WalletProvider wallets={[]} autoConnect={autoConnect} onError={(e) => console.error('[wallet-adapter]', e?.name, e?.message, (e as { error?: unknown })?.error ?? '')}>
         <SessionProvider>{children}</SessionProvider>
       </WalletProvider>
     </ConnectionProvider>
@@ -110,6 +110,8 @@ export function forgetWallet() {
 
 export function friendlyWalletError(e: unknown): string {
   const msg = String((e as Error)?.message ?? e)
+  // Keep the raw error in the console for debugging; the user sees the plain-English version.
+  console.error('[wallet]', (e as Error)?.name, msg, (e as { error?: unknown })?.error ?? '')
   if (/local network access/i.test(msg)) return 'Allow “local network access” when Chrome asks; the wallet needs it to connect.'
   if (/reject|declin|cancel|denied/i.test(msg)) return 'You cancelled in the wallet. Nothing was changed.'
   if (/not found|no wallet/i.test(msg)) return 'No wallet app found. Open Seeker Shield on your Seeker.'

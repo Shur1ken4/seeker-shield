@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- MWA's local association talks to the wallet over ws://localhost, so connect-src must allow it.
+    <!-- MWA's local association talks to the wallet over ws://localhost (and first probes http://localhost for
+         Chrome's Local Network Access permission), so connect-src must allow both.
          Every other network call goes to our own /api (which proxies Solana RPC, so no key reaches the browser). -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* wss://localhost:*; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* wss://localhost:* http://localhost:* http://127.0.0.1:*; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
     <meta name="theme-color" content="#0B0D0C" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#F6F7F5" media="(prefers-color-scheme: light)" />
