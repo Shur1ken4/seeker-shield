@@ -1,9 +1,9 @@
-import { env } from '../_lib/env.js'
-import { safeEqual } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { sendTelegram } from '../_lib/telegram.js'
-import { addWatcher, removeWatcher } from '../_lib/watch.js'
-import { syncHeliusWebhook } from '../_lib/helius.js'
+import { env } from '../../_lib/env.js'
+import { safeEqual } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { sendTelegram } from '../../_lib/telegram.js'
+import { addWatcher, removeWatcher } from '../../_lib/watch.js'
+import { syncHeliusWebhook } from '../../_lib/helius.js'
 
 /** Telegram bot updates. Only accepted with our secret header (set via scripts/set-telegram-webhook.ts). */
 export async function POST(req: Request) {

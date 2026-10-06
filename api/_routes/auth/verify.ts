@@ -1,10 +1,10 @@
 import bs58 from 'bs58'
 import { ed25519 } from '@noble/curves/ed25519.js'
 import { PublicKey } from '@solana/web3.js'
-import { fail, isWalletAddress, json, rateLimit, readJson } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { createSession } from '../_lib/session.js'
-import { findSgtMint } from '../_lib/sgt.js'
+import { fail, isWalletAddress, json, rateLimit, readJson } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { createSession } from '../../_lib/session.js'
+import { findSgtMint } from '../../_lib/sgt.js'
 
 export async function POST(req: Request) {
   const limited = await rateLimit(req, 'verify', 10)

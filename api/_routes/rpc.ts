@@ -1,5 +1,5 @@
-import { env } from './_lib/env.js'
-import { fail, rateLimit, readJson } from './_lib/http.js'
+import { env } from '../_lib/env.js'
+import { fail, rateLimit, readJson } from '../_lib/http.js'
 
 /**
  * Solana RPC proxy for the app, so the Helius key stays on the server.

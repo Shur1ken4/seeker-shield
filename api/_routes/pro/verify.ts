@@ -1,8 +1,8 @@
-import { env } from '../_lib/env.js'
-import { fail, json, rateLimit, readJson } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { checkPayment, extendPro } from '../_lib/pro.js'
-import { getSession } from '../_lib/session.js'
+import { env } from '../../_lib/env.js'
+import { fail, json, rateLimit, readJson } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { checkPayment, extendPro } from '../../_lib/pro.js'
+import { getSession } from '../../_lib/session.js'
 
 export async function POST(req: Request) {
   const limited = await rateLimit(req, 'proverify', 10)

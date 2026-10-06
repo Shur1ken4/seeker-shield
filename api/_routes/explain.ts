@@ -1,5 +1,5 @@
-import { explain, type ExplainInput } from './_lib/explain.js'
-import { fail, json, rateLimit, readJson } from './_lib/http.js'
+import { explain, type ExplainInput } from '../_lib/explain.js'
+import { fail, json, rateLimit, readJson } from '../_lib/http.js'
 
 const TYPES = new Set(['delegation', 'suspicious', 'empty', 'scam_match'])
 const SEVERITIES = new Set(['critical', 'warning', 'cleanup'])

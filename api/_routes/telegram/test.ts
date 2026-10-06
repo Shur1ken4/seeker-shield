@@ -1,7 +1,7 @@
-import { fail, json, rateLimit } from '../_lib/http.js'
-import { deliver } from '../_lib/alerts.js'
-import { getSession } from '../_lib/session.js'
-import { kv } from '../_lib/kv.js'
+import { fail, json, rateLimit } from '../../_lib/http.js'
+import { deliver } from '../../_lib/alerts.js'
+import { getSession } from '../../_lib/session.js'
+import { kv } from '../../_lib/kv.js'
 
 export async function POST(req: Request) {
   const limited = await rateLimit(req, 'tgtest', 3)

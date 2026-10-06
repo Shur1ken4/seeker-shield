@@ -1,8 +1,8 @@
-import { fail, json, rateLimit } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { extendPro } from '../_lib/pro.js'
-import { getSession } from '../_lib/session.js'
-import { findSgtMint } from '../_lib/sgt.js'
+import { fail, json, rateLimit } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { extendPro } from '../../_lib/pro.js'
+import { getSession } from '../../_lib/session.js'
+import { findSgtMint } from '../../_lib/sgt.js'
 
 /** First month free, once per Seeker Genesis Token mint (so moving the SGT to another wallet doesn't repeat it). */
 export async function POST(req: Request) {

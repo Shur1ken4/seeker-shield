@@ -1,8 +1,8 @@
-import { env } from '../_lib/env.js'
-import { safeEqual } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { escapeHtml, sendTelegram } from '../_lib/telegram.js'
-import type { Alert } from '../_lib/watch.js'
+import { env } from '../../_lib/env.js'
+import { safeEqual } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { escapeHtml, sendTelegram } from '../../_lib/telegram.js'
+import type { Alert } from '../../_lib/watch.js'
 
 /** Daily digest for free users (Vercel Cron sends Authorization: Bearer $CRON_SECRET). */
 export async function GET(req: Request) {

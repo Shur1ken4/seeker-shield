@@ -1,10 +1,10 @@
-import { fail, isWalletAddress, json, rateLimit, readJson } from './_lib/http.js'
-import { kv } from './_lib/kv.js'
-import { getSession } from './_lib/session.js'
-import { isSkrName, resolveSkr } from './_lib/skr.js'
-import { syncHeliusWebhook } from './_lib/helius.js'
-import { scanWallet } from './_lib/scan.js'
-import { addWatcher, getAlerts, getWatched, isPro, removeWatcher, setWatched, watchLimit } from './_lib/watch.js'
+import { fail, isWalletAddress, json, rateLimit, readJson } from '../_lib/http.js'
+import { kv } from '../_lib/kv.js'
+import { getSession } from '../_lib/session.js'
+import { isSkrName, resolveSkr } from '../_lib/skr.js'
+import { syncHeliusWebhook } from '../_lib/helius.js'
+import { scanWallet } from '../_lib/scan.js'
+import { addWatcher, getAlerts, getWatched, isPro, removeWatcher, setWatched, watchLimit } from '../_lib/watch.js'
 
 /** Everything the Watch tab needs, for the verified wallet. */
 export async function GET(req: Request) {

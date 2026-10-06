@@ -1,5 +1,5 @@
-import { fail, isWalletAddress, json, rateLimit } from './_lib/http.js'
-import { isSkrName, resolveSkr, reverseSkr } from './_lib/skr.js'
+import { fail, isWalletAddress, json, rateLimit } from '../_lib/http.js'
+import { isSkrName, resolveSkr, reverseSkr } from '../_lib/skr.js'
 
 /** GET /api/skr?address=... -> { name } ; GET /api/skr?name=alice.skr -> { address } */
 export async function GET(req: Request) {

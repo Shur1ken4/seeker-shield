@@ -1,7 +1,7 @@
-import { fail, isWalletAddress, json, rateLimit } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { newToken } from '../_lib/session.js'
-import { signInMessage } from '../_lib/signin.js'
+import { fail, isWalletAddress, json, rateLimit } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { newToken } from '../../_lib/session.js'
+import { signInMessage } from '../../_lib/signin.js'
 
 export async function GET(req: Request) {
   const limited = await rateLimit(req, 'nonce', 10)

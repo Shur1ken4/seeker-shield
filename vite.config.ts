@@ -14,7 +14,8 @@ function apiDev(): Plugin {
         const url = new URL(req.url, 'http://localhost')
         // Source files the app imports (e.g. /api/_lib/guard.ts) are served by Vite as modules.
         if (/\.[a-z]+$/i.test(url.pathname)) return next()
-        const file = path.join(server.config.root, 'api', `${url.pathname.slice(5)}.ts`)
+        // Same as production: every /api route goes through api/router.ts.
+        const file = path.join(server.config.root, 'api', 'router.ts')
         if (url.pathname.includes('/_') || !fs.existsSync(file)) {
           res.statusCode = 404
           return res.end('Not found')

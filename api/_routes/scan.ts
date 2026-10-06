@@ -1,5 +1,5 @@
-import { fail, isWalletAddress, json, rateLimit } from './_lib/http.js'
-import { scanWallet } from './_lib/scan.js'
+import { fail, isWalletAddress, json, rateLimit } from '../_lib/http.js'
+import { scanWallet } from '../_lib/scan.js'
 
 export async function GET(req: Request) {
   const limited = await rateLimit(req, 'scan', 20)

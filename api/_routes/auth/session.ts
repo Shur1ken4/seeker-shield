@@ -1,5 +1,5 @@
-import { json, rateLimit } from '../_lib/http.js'
-import { getSession } from '../_lib/session.js'
+import { json, rateLimit } from '../../_lib/http.js'
+import { getSession } from '../../_lib/session.js'
 
 export async function GET(req: Request) {
   const limited = await rateLimit(req, 'session', 30)

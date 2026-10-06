@@ -1,6 +1,6 @@
-import { fail, isWalletAddress, json, rateLimit } from './_lib/http.js'
-import { kv } from './_lib/kv.js'
-import { getStats } from './_lib/stats.js'
+import { fail, isWalletAddress, json, rateLimit } from '../_lib/http.js'
+import { kv } from '../_lib/kv.js'
+import { getStats } from '../_lib/stats.js'
 
 export async function GET(req: Request) {
   const limited = await rateLimit(req, 'stats', 30)

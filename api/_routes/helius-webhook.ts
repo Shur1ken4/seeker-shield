@@ -1,8 +1,8 @@
-import { env } from './_lib/env.js'
-import { safeEqual } from './_lib/http.js'
-import { checkWallet } from './_lib/alerts.js'
-import { kv } from './_lib/kv.js'
-import { ALL_WATCHED } from './_lib/watch.js'
+import { env } from '../_lib/env.js'
+import { safeEqual } from '../_lib/http.js'
+import { checkWallet } from '../_lib/alerts.js'
+import { kv } from '../_lib/kv.js'
+import { ALL_WATCHED } from '../_lib/watch.js'
 
 /** Helius calls this when a watched wallet has a transaction. Verified by the shared auth header. */
 export async function POST(req: Request) {

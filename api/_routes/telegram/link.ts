@@ -1,7 +1,7 @@
-import { env } from '../_lib/env.js'
-import { fail, json, rateLimit } from '../_lib/http.js'
-import { kv } from '../_lib/kv.js'
-import { getSession, newToken } from '../_lib/session.js'
+import { env } from '../../_lib/env.js'
+import { fail, json, rateLimit } from '../../_lib/http.js'
+import { kv } from '../../_lib/kv.js'
+import { getSession, newToken } from '../../_lib/session.js'
 
 /** One-time code for linking this wallet to a Telegram chat: t.me/<bot>?start=<code>. */
 export async function POST(req: Request) {

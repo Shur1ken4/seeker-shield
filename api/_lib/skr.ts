@@ -1,10 +1,12 @@
-import { createRequire } from 'node:module'
 import { Connection, PublicKey } from '@solana/web3.js'
+// @onsol/tldparser's ESM build has extensionless imports that Node can't load, so we import its
+// CommonJS build by path. A static import (not createRequire) lets Vercel bundle it with the function.
+// @ts-ignore -- no types for the deep path; typed via the cast below
+import tldCjs from '../../node_modules/@onsol/tldparser/dist/cjs/index.js'
 import { env } from './env.js'
 import { kv } from './kv.js'
 
-// @onsol/tldparser's ESM build has extensionless imports that Node can't load; its CommonJS build works.
-const { TldParser } = createRequire(import.meta.url)('@onsol/tldparser') as typeof import('@onsol/tldparser')
+const { TldParser } = tldCjs as typeof import('@onsol/tldparser')
 
 const parser = () => new TldParser(new Connection(env.rpcUrl, 'confirmed'))
 const DAY = 24 * 60 * 60
