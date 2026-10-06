@@ -1,0 +1,6 @@
+{
+  "_readme": "Known scam/drainer addresses (delegates, token mints, or update authorities). One object per address. Only add addresses with a public source. The example entry below is a placeholder and is ignored because its address is empty.",
+  "entries": [
+    { "address": "", "kind": "delegate | mint | update_authority", "label": "Example: drainer delegate", "source": "https://link-to-public-report" }
+  ]
+}
