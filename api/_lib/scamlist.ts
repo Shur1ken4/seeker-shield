@@ -1,6 +1,7 @@
-import seed from '../../data/scam-seed.json' with { type: 'json' }
+import { createRequire } from 'node:module'
 import { kv } from './kv.js'
 
+const seed = createRequire(import.meta.url)('../../data/scam-seed.json') as { entries: { address: string }[] }
 const KEY = 'scam:addresses'
 
 /** Known-bad addresses (delegates, mints, update authorities). Seeded once from data/scam-seed.json. */

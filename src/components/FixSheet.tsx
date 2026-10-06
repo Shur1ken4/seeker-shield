@@ -75,10 +75,10 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
         // One wallet approval for the whole batch.
         const signed = await signAllTransactions(p.ready.map((r) => r.tx))
         setStep('sending')
-        for (let i = 0; i < signed.length; i++) {
-          const sig = await connection.sendRawTransaction(signed[i].serialize(), { maxRetries: 3 })
-          await record(sig, i)
-        }
+        // Send everything first, then confirm, so later transactions don't expire while earlier ones confirm.
+        const sigs: string[] = []
+        for (const tx of signed) sigs.push(await connection.sendRawTransaction(tx.serialize(), { maxRetries: 3 }))
+        for (let i = 0; i < sigs.length; i++) await record(sigs[i], i)
       } else {
         for (let i = 0; i < p.ready.length; i++) {
           const sig = await sendTransaction(p.ready[i].tx, connection, { maxRetries: 3 })

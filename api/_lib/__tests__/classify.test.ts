@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classify, isProtected, isSgtMint, type ClassifyInput, type TokenAccountInput } from '../classify'
+import { classify, isProtected, isSgtMint, lureSignals, type ClassifyInput, type TokenAccountInput } from '../classify'
 import { computeScore, scoreWord } from '../score'
 import { SGT_GROUP_ADDRESS, SGT_METADATA_ADDRESS, SKR_MINT, TOKEN_2022_PROGRAM, TOKEN_PROGRAM, WSOL_MINT } from '../constants'
 
@@ -139,5 +139,12 @@ describe('score', () => {
   })
   it('maps bands to words', () => {
     expect([95, 90, 89, 70, 69, 40, 39, 0].map(scoreWord)).toEqual(['Safe', 'Safe', 'Okay', 'Okay', 'At risk', 'At risk', 'Danger', 'Danger'])
+  })
+})
+
+describe('lure words', () => {
+  it('matches whole words only', () => {
+    expect(lureSignals({ name: 'Freedom Cat #12' })).toEqual([])
+    expect(lureSignals({ name: 'FREE SKR - claim now' }).length).toBeGreaterThan(0)
   })
 })

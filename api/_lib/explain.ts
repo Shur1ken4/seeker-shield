@@ -4,6 +4,7 @@ import type { Finding, FindingType, Severity } from './types.js'
 
 export const MODEL = 'claude-haiku-4-5-20251001'
 const CACHE_SECONDS = 7 * 24 * 60 * 60
+const DAILY_AI_CALLS = 1500
 
 export type ExplainInput = Pick<Finding, 'id' | 'type' | 'severity' | 'mint' | 'symbol' | 'name' | 'reasons' | 'unfixableReason'>
 
@@ -97,7 +98,9 @@ export async function explain(findings: ExplainInput[]): Promise<Record<string, 
       else missing.push(f)
     }),
   )
-  if (missing.length && env.anthropicKey) {
+  const day = new Date().toISOString().slice(0, 10)
+  const underCap = missing.length > 0 && (await kv.incr(`explain:calls:${day}`, 2 * 86400)) <= DAILY_AI_CALLS
+  if (missing.length && env.anthropicKey && underCap) {
     try {
       const ai = await askClaude(missing)
       await Promise.all(

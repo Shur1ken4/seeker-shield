@@ -80,8 +80,8 @@ function memory(): KV {
     },
     async incr(k, ttl) {
       const n = Number(read(k) ?? 0) + 1
-      write(k, n, n === 1 ? ttl : undefined)
-      if (n > 1) store.get(k)!.v = n
+      if (n === 1) write(k, n, ttl)
+      else store.get(k)!.v = n
       return n
     },
     async sadd(k, ...m) {

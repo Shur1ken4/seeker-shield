@@ -70,7 +70,7 @@ export function lureSignals(asset: AssetInfo): string[] {
   const signals: string[] = []
   if (URL_PATTERN.test(text)) signals.push('link in name')
   const lower = `${text} ${asset.uri ?? ''}`.toLowerCase()
-  for (const w of LURE_WORDS) if (lower.includes(w)) signals.push(`"${w}" in name or metadata`)
+  for (const w of LURE_WORDS) if (new RegExp(`(^|[^a-z])${w}([^a-z]|$)`).test(lower)) signals.push(`"${w}" in name or metadata`)
   // A metadata URI on an odd domain is common for spam, but URIs are normal for real tokens,
   // so only lure words inside the URI count (handled above).
   return signals
