@@ -41,3 +41,19 @@ export interface ScanResult {
   tokenAccountCount: number
   cached: boolean
 }
+
+export interface Watched {
+  address: string
+  nickname: string
+  addedAt: number
+}
+
+export interface Alert {
+  id: string
+  at: number
+  wallet: string
+  nickname: string
+  severity: 'critical' | 'warning' | 'info'
+  title: string
+  text: string
+}
