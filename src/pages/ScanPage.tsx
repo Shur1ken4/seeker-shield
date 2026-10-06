@@ -10,6 +10,7 @@ import { ScoreDial } from '@/components/ScoreDial'
 import { FindingCardSkeleton, Skeleton } from '@/components/Skeleton'
 import { useToast } from '@/components/Toast'
 import { ConnectHero } from '@/components/ConnectHero'
+import { DemoPermission } from '@/components/DemoPermission'
 import { forgetWallet } from '@/lib/wallet'
 import type { FixItem } from '@/lib/fixes'
 import { short, sol, timeAgo } from '@/lib/format'
@@ -167,6 +168,8 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
           )}
         </div>
       )}
+
+      {!readOnly && data && <DemoPermission onDone={rescan} />}
 
       <BurnSheet
         finding={burnTarget}

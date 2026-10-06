@@ -62,7 +62,8 @@ export function FindingCard({
   return (
     <article className={cn('rounded-r-card border border-l-[3px] border-border bg-surface-1 p-4', border[finding.severity])}>
       <div className="flex gap-3">
-        <TokenAvatar src={finding.image} label={finding.symbol || finding.name || finding.mint} />
+        {/* Only verified tokens get remote images: a spam token's image could be a tracking pixel. */}
+        <TokenAvatar src={finding.raw.jupiterVerified === true ? finding.image : null} label={finding.symbol || finding.name || finding.mint} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="min-w-0 break-words text-body font-medium">{title[finding.type](finding)}</h3>

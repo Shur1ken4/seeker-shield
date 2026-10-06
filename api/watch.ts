@@ -8,6 +8,8 @@ import { addWatcher, getAlerts, getWatched, isPro, removeWatcher, setWatched, wa
 
 /** Everything the Watch tab needs, for the verified wallet. */
 export async function GET(req: Request) {
+  const limited = await rateLimit(req, 'watchget', 30)
+  if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Please verify your wallet first.', 401)
   const [watched, alerts, chatId, pro, limit] = await Promise.all([
@@ -69,6 +71,8 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const limited = await rateLimit(req, 'watchdel', 20)
+  if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Please verify your wallet first.', 401)
   const body = await readJson<{ address?: string }>(req)
