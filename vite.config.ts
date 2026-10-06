@@ -12,6 +12,8 @@ function apiDev(): Plugin {
       server.middlewares.use(async (req, res, next) => {
         if (!req.url?.startsWith('/api/')) return next()
         const url = new URL(req.url, 'http://localhost')
+        // Source files the app imports (e.g. /api/_lib/guard.ts) are served by Vite as modules.
+        if (/\.[a-z]+$/i.test(url.pathname)) return next()
         const file = path.join(server.config.root, 'api', `${url.pathname.slice(5)}.ts`)
         if (url.pathname.includes('/_') || !fs.existsSync(file)) {
           res.statusCode = 404

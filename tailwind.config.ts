@@ -34,9 +34,6 @@ export default {
       score: ['64px', '1'],
     },
     fontWeight: { normal: '400', medium: '500', semibold: '600' },
-    spacing: {
-      0: '0', px: '1px', 1: '4px', 2: '8px', 3: '12px', 4: '16px', 6: '24px', 8: '32px', 12: '48px',
-    },
     borderRadius: { none: '0', chip: '6px', card: '10px', sheet: '16px', full: '9999px' },
     extend: {
       minHeight: { tap: '48px' },
