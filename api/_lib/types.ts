@@ -40,6 +40,24 @@ export interface ScanResult {
   scannedAt: number
   tokenAccountCount: number
   cached: boolean
+  /** Native SOL in the wallet (lamports). */
+  solLamports: number
+  /** How long the scan took, for the "what we checked" report. */
+  durationMs: number
+  /** Every token the scan looked at, so users can see the work, not just the problems. */
+  tokens: CheckedToken[]
+}
+
+export interface CheckedToken {
+  tokenAccount: string
+  mint: string
+  symbol: string | null
+  name: string | null
+  uiAmount: number
+  usdValue: number | null
+  verified: boolean
+  /** Worst severity among this token's findings, or 'ok'. */
+  status: 'ok' | Severity
 }
 
 export interface Watched {

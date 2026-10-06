@@ -14,6 +14,20 @@ type Step = 'planning' | 'review' | 'signing' | 'sending' | 'done' | 'error'
 export interface FixResult {
   fixedIds: string[]
   reclaimedLamports: number
+  /** Resolves once the server has counted these fixes on-chain (for Profile totals). */
+  recorded: Promise<void>
+}
+
+/** The network can take a few seconds to serve a just-confirmed transaction, so retry. */
+async function recordFix(owner: string, signature: string) {
+  for (let i = 0; i < 6; i++) {
+    try {
+      await api.post('/api/fixes/record', { owner, signature })
+      return
+    } catch {
+      await new Promise((r) => setTimeout(r, 2000 + i * 1000))
+    }
+  }
 }
 
 const PLAN_MAX_AGE_MS = 45_000
@@ -27,7 +41,8 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState({ done: 0, total: 0 })
   const plannedAt = useRef(0)
-  const result = useRef<FixResult>({ fixedIds: [], reclaimedLamports: 0 })
+  const result = useRef<Omit<FixResult, 'recorded'>>({ fixedIds: [], reclaimedLamports: 0 })
+  const recordings = useRef<Promise<void>[]>([])
 
   const makePlan = useCallback(async () => {
     if (!items || !publicKey) return null
@@ -49,6 +64,7 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
   useEffect(() => {
     if (items) {
       result.current = { fixedIds: [], reclaimedLamports: 0 }
+      recordings.current = []
       makePlan()
     }
   }, [items, makePlan])
@@ -69,7 +85,7 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
         result.current.fixedIds.push(...r.items.map((i) => i.finding.id))
         result.current.reclaimedLamports += r.items.filter((i) => i.action !== 'revoke').reduce((s, i) => s + i.finding.rentLamports, 0)
         setProgress((x) => ({ ...x, done: x.done + 1 }))
-        api.post('/api/fixes/record', { owner, signature }).catch(() => {})
+        recordings.current.push(recordFix(owner, signature))
       }
       if (signAllTransactions) {
         // One wallet approval for the whole batch.
@@ -87,12 +103,12 @@ export function FixSheet({ items, onClose, onDone }: { items: FixItem[] | null; 
         }
       }
       setStep('done')
-      onDone(result.current)
+      onDone({ ...result.current, recorded: Promise.all(recordings.current).then(() => {}) })
     } catch (e) {
       const msg = String((e as Error)?.message ?? e)
       setError(/network|expired|waiting|rejected the transaction/i.test(msg) ? msg : friendlyWalletError(e))
       setStep('error')
-      if (result.current.fixedIds.length) onDone(result.current)
+      if (result.current.fixedIds.length) onDone({ ...result.current, recorded: Promise.all(recordings.current).then(() => {}) })
     }
   }
 

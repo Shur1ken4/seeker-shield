@@ -10,8 +10,10 @@ import { ScoreDial } from '@/components/ScoreDial'
 import { FindingCardSkeleton, Skeleton } from '@/components/Skeleton'
 import { useToast } from '@/components/Toast'
 import { ConnectHero } from '@/components/ConnectHero'
+import { ScanReport } from '@/components/ScanReport'
 import { DemoPermission } from '@/components/DemoPermission'
 import { forgetWallet } from '@/lib/wallet'
+import { addLocalStats } from '@/lib/localStats'
 import type { FixItem } from '@/lib/fixes'
 import { short, sol, timeAgo } from '@/lib/format'
 import { useExplanations, useHidden, useScan } from '@/lib/useScan'
@@ -34,7 +36,7 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
   })
   const owner = publicKey?.toBase58() ?? lookup
   const readOnly = !publicKey
-  const { data, loading, error, rescan } = useScan(owner)
+  const { data, loading, error, rescan, markFixed } = useScan(owner)
   const explanations = useExplanations(data?.findings)
   const { hidden, hide, unhideAll } = useHidden(owner)
   const [fixItems, setFixItems] = useState<FixItem[] | null>(null)
@@ -115,6 +117,8 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
         <p className="rounded-chip bg-surface-1 p-3 text-body-sm text-text-secondary">This is a read-only check. Connect this wallet on its phone to fix these.</p>
       )}
 
+      {data && <ScanReport data={data} findings={visible} />}
+
       {loading && !data && (
         <div className="space-y-3">
           <FindingCardSkeleton />
@@ -127,7 +131,7 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
         <EmptyState
           icon={<ShieldCheck size={28} aria-hidden />}
           title="You’re all clear"
-          body={`We checked ${data.tokenAccountCount} token account${data.tokenAccountCount === 1 ? '' : 's'} and found no risky permissions, spam or clutter.`}
+          body="Nothing needs fixing. Turn on alerts in Watch and Shield will tell you if that changes."
           action={<Button variant="secondary" onClick={rescan} loading={loading}>Scan again</Button>}
         />
       )}
@@ -184,8 +188,11 @@ export function ScanPage({ onFixed }: { onFixed?: () => void }) {
         onClose={() => setFixItems(null)}
         onDone={(r) => {
           toast('success', r.reclaimedLamports > 0 ? `Fixed. ${sol(r.reclaimedLamports)} reclaimed.` : 'Fixed. Your wallet is safer.')
-          rescan()
+          // Update the score now; markFixed also re-checks the chain a few times in the background.
+          markFixed(r.fixedIds)
+          if (owner) addLocalStats(owner, { fixed: r.fixedIds.length, reclaimedLamports: r.reclaimedLamports })
           onFixed?.()
+          r.recorded.then(() => onFixed?.())
         }}
       />
     </section>

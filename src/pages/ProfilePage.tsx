@@ -8,6 +8,7 @@ import { api } from '@/lib/api'
 import { short, sol } from '@/lib/format'
 import type { ProInfo } from '@/lib/pro'
 import { useSession } from '@/lib/wallet'
+import { readLocalStats } from '@/lib/localStats'
 
 interface StatsData {
   stats: { reclaimedLamports: number; fixed: number }
@@ -30,6 +31,11 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
     api.get<{ name: string | null }>(`/api/skr?address=${owner}`).then((r) => setSkr(r.name)).catch(() => {})
   }, [owner])
   useEffect(load, [load, refreshKey, hasSession])
+
+  // Server totals are verified on-chain; the local tally covers the seconds before the server catches up.
+  const local = owner ? readLocalStats(owner) : { fixed: 0, reclaimedLamports: 0 }
+  const reclaimed = Math.max(stats?.stats.reclaimedLamports ?? 0, local.reclaimedLamports)
+  const fixed = Math.max(stats?.stats.fixed ?? 0, local.fixed)
 
   if (!owner) return <EmptyState title="Connect your wallet" body="Your score history, SOL reclaimed and Pro status live here." action={<Button onClick={onGoToScan}>Go to Scan</Button>} />
 
@@ -57,11 +63,11 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
       <dl className="grid grid-cols-2 gap-3">
         <div className="rounded-card border border-border bg-surface-1 p-4">
           <dt className="text-caption text-text-muted">SOL reclaimed</dt>
-          <dd className="mt-1 font-mono text-title font-medium">{stats ? sol(stats.stats.reclaimedLamports).replace(' SOL', '') : '–'}</dd>
+          <dd className="mt-1 font-mono text-title font-medium">{sol(reclaimed).replace(' SOL', '')}</dd>
         </div>
         <div className="rounded-card border border-border bg-surface-1 p-4">
           <dt className="text-caption text-text-muted">Issues fixed</dt>
-          <dd className="mt-1 font-mono text-title font-medium">{stats?.stats.fixed ?? '–'}</dd>
+          <dd className="mt-1 font-mono text-title font-medium">{fixed}</dd>
         </div>
       </dl>
 

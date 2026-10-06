@@ -50,11 +50,25 @@ function apiDev(): Plugin {
   }
 }
 
+// api/_lib/skr.ts imports @onsol/tldparser's CommonJS build by path (see the note there).
+// In dev, swap that file for a tiny wrapper that loads it with Node's require, as Vercel does.
+function cjsTldParser(): Plugin {
+  return {
+    name: 'cjs-tldparser',
+    enforce: 'pre',
+    load(id) {
+      if (!id.includes('@onsol/tldparser/dist/cjs/index.js')) return
+      const file = id.split('?')[0]
+      return `import { createRequire } from 'node:module'\nexport default createRequire(${JSON.stringify(file)})(${JSON.stringify(file)})\n`
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   // Make .env.local visible to the dev /api functions (server only; never exposed to the browser).
   Object.assign(process.env, loadEnv(mode, process.cwd(), ''))
   return {
-    plugins: [react(), apiDev()],
+    plugins: [react(), apiDev(), cjsTldParser()],
     resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } },
     server: { host: true },
   }

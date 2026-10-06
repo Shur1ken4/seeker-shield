@@ -2,9 +2,9 @@ import { classify } from './classify.js'
 import { computeScore, scoreWord } from './score.js'
 import { kv } from './kv.js'
 import { loadScamList } from './scamlist.js'
-import { getAssetsByOwner, getJupiterInfo, getMints, getTokenAccounts } from './solana.js'
+import { getAssetsByOwner, getJupiterInfo, getMints, getTokenAccounts, rpc } from './solana.js'
 import { SCAN_CACHE_SECONDS, TOKEN_2022_PROGRAM } from './constants.js'
-import type { ScanResult } from './types.js'
+import type { CheckedToken, ScanResult, Severity } from './types.js'
 
 export async function scanWallet(owner: string, { fresh = false } = {}): Promise<ScanResult> {
   const cacheKey = `scan:${owner}`
@@ -13,7 +13,13 @@ export async function scanWallet(owner: string, { fresh = false } = {}): Promise
     if (cached) return { ...cached, cached: true }
   }
 
-  const [accounts, das, scamList] = await Promise.all([getTokenAccounts(owner), getAssetsByOwner(owner), loadScamList()])
+  const started = Date.now()
+  const [accounts, das, scamList, balance] = await Promise.all([
+    getTokenAccounts(owner),
+    getAssetsByOwner(owner),
+    loadScamList(),
+    rpc<{ value: number }>('getBalance', [owner, { commitment: 'confirmed' }]),
+  ])
   const mintList = [...new Set(accounts.map((a) => a.mint))]
   const t22Mints = [...new Set(accounts.filter((a) => a.programId === TOKEN_2022_PROGRAM).map((a) => a.mint))]
   const [jup, mints] = await Promise.all([getJupiterInfo(mintList), getMints(t22Mints)])
@@ -38,7 +44,38 @@ export async function scanWallet(owner: string, { fresh = false } = {}): Promise
 
   const findings = classify({ accounts, mints, assets, compressed: das.compressed, scamList })
   const score = computeScore(findings)
-  const result: ScanResult = { owner, score, word: scoreWord(score), findings, scannedAt: Date.now(), tokenAccountCount: accounts.length, cached: false }
+  const rank: Record<'ok' | Severity, number> = { ok: 0, cleanup: 1, warning: 2, critical: 3 }
+  const tokens: CheckedToken[] = accounts
+    .map((a) => {
+      const meta = assets[a.mint]
+      const worst = findings
+        .filter((f) => f.tokenAccount === a.pubkey)
+        .reduce<'ok' | Severity>((w, f) => (rank[f.severity] > rank[w] ? f.severity : w), 'ok')
+      return {
+        tokenAccount: a.pubkey,
+        mint: a.mint,
+        symbol: meta?.symbol ?? null,
+        name: meta?.name ?? null,
+        uiAmount: a.uiAmount,
+        usdValue: meta?.usdPrice != null ? a.uiAmount * meta.usdPrice : null,
+        verified: !!meta?.verified,
+        status: worst,
+      }
+    })
+    .sort((x, y) => rank[y.status] - rank[x.status] || (y.usdValue ?? 0) - (x.usdValue ?? 0))
+    .slice(0, 300)
+  const result: ScanResult = {
+    owner,
+    score,
+    word: scoreWord(score),
+    findings,
+    scannedAt: Date.now(),
+    tokenAccountCount: accounts.length,
+    cached: false,
+    solLamports: balance.value,
+    durationMs: Date.now() - started,
+    tokens,
+  }
 
   await Promise.all([
     kv.set(cacheKey, result, { ex: SCAN_CACHE_SECONDS }),
