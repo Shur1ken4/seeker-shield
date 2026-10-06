@@ -1,0 +1,13 @@
+node_modules
+dist
+.vercel
+.env*
+!.env.example
+*.keystore
+*.jks
+*.keystore.*
+/scripts/.burner*
+/android/**/build
+/android/.gradle
+/release/*.apk
+.DS_Store

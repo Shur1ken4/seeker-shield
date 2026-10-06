@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- MWA's local association talks to the wallet over ws://localhost, so connect-src must allow it.
+         Every other network call goes to our own /api (which proxies Solana RPC, so no key reaches the browser). -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' https: data: blob:; connect-src 'self' ws://localhost:* ws://127.0.0.1:* wss://localhost:*; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <meta name="theme-color" content="#0B0D0C" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F6F7F5" media="(prefers-color-scheme: light)" />
+    <meta name="description" content="A security guard for your Seeker wallet." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <title>Seeker Shield</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
