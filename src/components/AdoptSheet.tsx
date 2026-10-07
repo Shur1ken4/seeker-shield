@@ -33,6 +33,13 @@ export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClos
     setBusy(true)
     setError(null)
     try {
+      if (info.testMode) {
+        // No payment in test mode; the server only allows this while PAYMENTS_TEST_MODE is on.
+        await api.post('/api/pro/test-unlock')
+        setStep('done')
+        onAdopted()
+        return
+      }
       // Build and test-run the payment first; only then ask for the fingerprint.
       const built = await buildProPayment(connection, publicKey, info, info.adoptPriceSkr)
       setStep('paying')
@@ -80,10 +87,21 @@ export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClos
               ))}
             </ul>
             <p className="text-center text-caption text-text-muted">Scans and fixes stay free.</p>
-            <Button className="w-full" onClick={adopt} loading={busy} disabled={!info?.treasury}>
-              <Fingerprint size={20} aria-hidden /> Adopt with fingerprint
-            </Button>
-            {info && !info.treasury && <p className="text-center text-caption text-text-muted">SKR payments open soon.</p>}
+            {info?.testMode ? (
+              <>
+                <Button className="w-full" onClick={adopt} loading={busy}>
+                  Unlock free (test mode)
+                </Button>
+                <p className="text-center text-caption text-warning">Test mode: no SKR is charged.</p>
+              </>
+            ) : (
+              <>
+                <Button className="w-full" onClick={adopt} loading={busy} disabled={!info?.treasury}>
+                  <Fingerprint size={20} aria-hidden /> Adopt with fingerprint
+                </Button>
+                {info && !info.treasury && <p className="text-center text-caption text-text-muted">SKR payments open soon.</p>}
+              </>
+            )}
           </>
         )}
 

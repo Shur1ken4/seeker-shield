@@ -11,6 +11,7 @@ import * as r_health from './_routes/health.js'
 import * as r_helius_webhook from './_routes/helius-webhook.js'
 import * as r_pro_claim_free from './_routes/pro/claim-free.js'
 import * as r_pro_info from './_routes/pro/info.js'
+import * as r_pro_test_unlock from './_routes/pro/test-unlock.js'
 import * as r_pro_verify from './_routes/pro/verify.js'
 import * as r_rpc from './_routes/rpc.js'
 import * as r_scan from './_routes/scan.js'
@@ -35,6 +36,7 @@ const routes: Record<string, Partial<Record<string, Handler>>> = {
   'helius-webhook': r_helius_webhook,
   'pro/claim-free': r_pro_claim_free,
   'pro/info': r_pro_info,
+  'pro/test-unlock': r_pro_test_unlock,
   'pro/verify': r_pro_verify,
   'rpc': r_rpc,
   'scan': r_scan,

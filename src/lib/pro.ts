@@ -11,6 +11,7 @@ export interface ProInfo {
   priceSkr: number
   adoptPriceSkr: number
   adopted: boolean
+  testMode: boolean
   days: number
   mint: string
   decimals: number | null

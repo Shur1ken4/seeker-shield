@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     priceSkr: PRO_PRICE_SKR,
     adoptPriceSkr: ADOPT_PRICE_SKR,
     adopted,
+    testMode: env.paymentsTestMode,
     days: PRO_DAYS,
     mint: SKR_MINT,
     decimals,

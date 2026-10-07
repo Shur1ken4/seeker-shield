@@ -24,6 +24,10 @@ export const env = {
   get appUrl() {
     return (process.env.APP_URL ?? '').replace(/\/$/, '')
   },
+  /** PAYMENTS_TEST_MODE=true: unlocking Wardy is free and labelled as a test. Never set it alongside real payments. */
+  get paymentsTestMode() {
+    return process.env.PAYMENTS_TEST_MODE === 'true'
+  },
   get jupiterKey() {
     return process.env.JUPITER_API_KEY ?? ''
   },
