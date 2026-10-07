@@ -47,7 +47,7 @@ function summaryLine(findings: Finding[], readOnly: boolean) {
 
 /** Wardy's own short line, by mood. */
 function moodLine(mood: WardyMood, fed: boolean) {
-  if (!fed) return 'I’m hungry. Feed me to start today’s patrol.'
+  if (!fed) return 'I’m hungry. Scan your wallet to feed me.'
   switch (mood) {
     case 'happy':
       return 'All quiet on my patrol.'
@@ -82,20 +82,16 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   const [adoptOpen, setAdoptOpen] = useState(false)
   const adopted = !!wardy.state?.adopted
 
-  // Feeding Wardy = today's patrol: a fresh scan, then the server counts the meal once per day.
+  // Scanning IS feeding: the day's first scan of your own wallet is Wardy's meal (counted once per day on the server).
   const [feeding, setFeeding] = useState(false)
-  const feed = async () => {
-    setFeeding(true)
-    try {
-      if (!hasSession) await signIn()
-      await rescan()
-      const r = await wardy.patrol()
-      if (!r) return toast('error', 'Wardy couldn’t start his patrol. Try again in a moment.')
-      if (r.already) return
-      setEating(true)
-      window.setTimeout(() => setEating(false), 2200)
-      setGained(r.gained)
-      toast('success', r.napped ? 'Wardy woke up and ate. Patrol done.' : 'Patrol done. Wardy’s fed.')
+  const eatScan = async () => {
+    const r = await wardy.patrol()
+    // null = already eaten in this session (the server also counts only one meal a day).
+    if (!r || r.already) return
+    setEating(true)
+    window.setTimeout(() => setEating(false), 2200)
+    setGained(r.gained)
+    toast('success', r.napped ? 'Wardy woke up and ate your scan.' : 'Wardy ate today’s scan. Yum.')
       if (r.levelUp) {
         celebrate('big')
         toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)
@@ -104,12 +100,28 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
         celebrate('big')
         toast('success', `${r.state.streak}-day streak. ${r.rewardProDays} free Pro days.`)
       }
+  }
+
+  /** "Scan & feed Wardy": sign in if needed (needs a tap), then scan, then he eats it. */
+  const feed = async () => {
+    setFeeding(true)
+    try {
+      if (!hasSession) await signIn()
+      await rescan()
+      await eatScan()
     } catch (e) {
       toast('error', (e as Error).message)
     } finally {
       setFeeding(false)
     }
   }
+
+  // Any scan of your own wallet (opening the app, Scan again) feeds a hungry Wardy automatically.
+  useEffect(() => {
+    if (readOnly || !data || !hasSession || !adopted || feeding || wardy.state?.patrolledToday) return
+    eatScan().catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readOnly, data?.scannedAt, hasSession, adopted, wardy.state?.patrolledToday])
 
   // Came from "Unlock Wardy" on the first screen: open the adopt flow once the wallet is connected.
   useEffect(() => {
@@ -183,10 +195,10 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
       {loading && !data ? (
         <div className="flex items-center gap-5" aria-label="Scanning">
           <div className="flex h-[156px] w-[156px] shrink-0 items-center justify-center rounded-full border-[6px] border-surface-2">
-            <Wardy mood="calm" size={78} />
+            <Wardy mood={readOnly ? 'calm' : 'eating'} size={78} />
           </div>
           <div className="space-y-2">
-            <p className="text-body font-medium">Wardy is patrolling…</p>
+            <p className="text-body font-medium">{readOnly ? 'Wardy is patrolling…' : 'Wardy is eating your scan…'}</p>
           </div>
         </div>
       ) : data ? (

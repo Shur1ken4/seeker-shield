@@ -194,11 +194,11 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
             </div>
             {state.patrolledToday ? (
               <p className="flex items-center justify-center gap-1 text-body-sm text-safe">
-                <Check size={16} aria-hidden /> Fed today · free Pro in {state.daysToReward} day{state.daysToReward === 1 ? '' : 's'}
+                <Check size={16} aria-hidden /> Fed with today’s scan · free Pro in {state.daysToReward} day{state.daysToReward === 1 ? '' : 's'}
               </p>
             ) : (
               <Button className="w-full" onClick={onFeed} loading={feeding}>
-                <Utensils size={18} aria-hidden /> Feed Wardy (daily patrol)
+                <Utensils size={18} aria-hidden /> Scan & feed Wardy
               </Button>
             )}
           </div>
