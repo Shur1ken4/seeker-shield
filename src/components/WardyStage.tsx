@@ -30,10 +30,12 @@ interface Props {
   onUnlock?: () => void
   unlocking?: boolean
   unlockPrice?: number
+  /** Smaller stage when Wardy plays a supporting role on the screen. */
+  compact?: boolean
 }
 
 /** The pet: tap him, rub him, feed him. He looks at your finger and reacts. */
-export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, feeding, onUnlock, unlocking, unlockPrice }: Props) {
+export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, feeding, onUnlock, unlocking, unlockPrice, compact }: Props) {
   const [reaction, setReaction] = useState<{ mood: WardyMood | null; text: string | null; anim: string }>({ mood: null, text: null, anim: '' })
   const [look, setLook] = useState({ x: 0, y: 0 })
   const [hearts, setHearts] = useState<{ id: number; x: number }[]>([])
@@ -101,7 +103,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
       {/* Stage: he looks at your finger, reacts to taps, and loves a rub. */}
       <div
         ref={stageRef}
-        className="relative mx-auto mt-2 flex h-[210px] touch-none select-none items-end justify-center"
+        className={cn('relative mx-auto mt-2 flex touch-none select-none items-end justify-center', compact ? 'h-[170px]' : 'h-[210px]')}
         onPointerMove={onMove}
         onPointerDown={onDown}
         onPointerUp={onUp}
@@ -116,15 +118,15 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
       >
         <span aria-hidden className="absolute bottom-3 h-3 w-28 rounded-full bg-bg/60" />
         <div key={reaction.anim} className={cn('relative mb-5', reaction.anim.split(' ')[0])}>
-          <Wardy mood={shownMood} size={124} look={locked ? undefined : look} grey={locked} />
+          <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} />
         </div>
 
         {locked && (
           <>
             {/* Glass capsule with a little lock */}
-            <span aria-hidden className="pointer-events-none absolute bottom-1 h-[196px] w-[176px] rounded-t-full border-2 border-text-muted/30 bg-surface-2/40" />
-            <span aria-hidden className="pointer-events-none absolute bottom-[120px] left-[calc(50%-62px)] h-14 w-3 rotate-[20deg] rounded-full bg-text-primary/10" />
-            <span className="absolute bottom-4 right-[calc(50%-96px)] flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-2 text-text-secondary">
+            <span aria-hidden className={cn('pointer-events-none absolute bottom-1 rounded-t-full border-2 border-text-muted/30 bg-surface-2/40', compact ? 'h-[160px] w-[146px]' : 'h-[196px] w-[176px]')} />
+            <span aria-hidden className={cn('pointer-events-none absolute h-14 w-3 rotate-[20deg] rounded-full bg-text-primary/10', compact ? 'bottom-[96px] left-[calc(50%-52px)]' : 'bottom-[120px] left-[calc(50%-62px)]')} />
+            <span className={cn('absolute bottom-4 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface-2 text-text-secondary', compact ? 'right-[calc(50%-82px)]' : 'right-[calc(50%-96px)]')}>
               <Lock size={16} aria-hidden />
             </span>
           </>
@@ -147,7 +149,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
 
       {locked ? (
         <div className="space-y-2">
-          <Button className="w-full" onClick={onUnlock} loading={unlocking}>
+          <Button className="w-full" variant={compact ? 'secondary' : 'primary'} onClick={onUnlock} loading={unlocking}>
             <Lock size={18} aria-hidden /> Unlock Wardy · {unlockPrice} SKR
           </Button>
           <p className="text-center text-caption text-text-muted">One time, about $0.90. Daily patrols, streaks and alerts.</p>

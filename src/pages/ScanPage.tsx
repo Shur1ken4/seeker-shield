@@ -34,14 +34,29 @@ const GROUPS: { severity: Severity; label: string; hint: string }[] = [
   { severity: 'cleanup', label: 'Tidy up', hint: 'Harmless, and gives SOL back' },
 ]
 
-/** What Wardy says about the wallet, in his own voice. */
+/** The plain status line under the score. */
 function summaryLine(findings: Finding[], readOnly: boolean) {
-  const whose = readOnly ? 'this' : 'your'
-  if (!findings.length) return `All quiet. Nothing can drain ${whose} wallet.`
+  const whose = readOnly ? 'This' : 'Your'
+  if (!findings.length) return `${whose} wallet is safe. Nothing needs fixing.`
   const urgent = findings.filter((f) => f.severity !== 'cleanup').length
   const tidy = findings.length - urgent
-  if (urgent) return `I found ${urgent} thing${urgent === 1 ? '' : 's'} to fix.`
-  return readOnly ? `Safe. ${tidy} old account${tidy === 1 ? ' is' : 's are'} holding SOL.` : `You’re safe. ${tidy} old account${tidy === 1 ? ' holds' : 's hold'} SOL for you.`
+  if (urgent) return `${urgent} thing${urgent === 1 ? '' : 's'} to fix${tidy ? `, plus ${tidy} to tidy up` : ''}.`
+  return `Safe. ${tidy} old account${tidy === 1 ? ' holds' : 's hold'} SOL ${readOnly ? 'the owner' : 'you'} can get back.`
+}
+
+/** Wardy's own short line, by mood. */
+function moodLine(mood: WardyMood, fed: boolean) {
+  if (!fed) return 'I’m hungry. Feed me to start today’s patrol.'
+  switch (mood) {
+    case 'happy':
+      return 'All quiet on my patrol.'
+    case 'calm':
+      return 'Mostly fine. I’m watching.'
+    case 'worried':
+      return 'Something needs a look.'
+    default:
+      return 'Fix the urgent ones, please!'
+  }
 }
 
 export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoToWatch?: () => void }) {
@@ -174,21 +189,9 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <WardyStage
-              locked={!!wardy.state && !adopted}
-              mood={wardyMood(false, !!wardy.state?.sleepy && !wardy.state.patrolledToday) ?? moodForScore(score)}
-              line={summaryLine(visible, readOnly)}
-              state={wardy.state}
-              eating={eating}
-              gained={gained}
-              onFeed={feed}
-              feeding={feeding}
-              onUnlock={startAdopt}
-              unlocking={signingIn}
-              unlockPrice={ADOPT_PRICE_SKR}
-            />
+          <div className="space-y-2">
             <ScoreBar score={score} />
+            <p className="text-body text-text-primary">{summaryLine(visible, readOnly)}</p>
           </div>
         )
       ) : null}
@@ -206,6 +209,23 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
             {fixAllReclaim > 0 ? `Returns about ${sol(fixAllReclaim)}. ` : ''}Your tokens don’t move.
           </p>
         </div>
+      )}
+
+      {data && !readOnly && (
+        <WardyStage
+          compact
+          locked={!!wardy.state && !adopted}
+          mood={wardyMood(false, !!wardy.state?.sleepy && !wardy.state.patrolledToday) ?? moodForScore(score)}
+          line={moodLine(moodForScore(score), !!wardy.state?.patrolledToday)}
+          state={wardy.state}
+          eating={eating}
+          gained={gained}
+          onFeed={feed}
+          feeding={feeding}
+          onUnlock={startAdopt}
+          unlocking={signingIn}
+          unlockPrice={ADOPT_PRICE_SKR}
+        />
       )}
 
       {data && readOnly && visible.length > 0 && (

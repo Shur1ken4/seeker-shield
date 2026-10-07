@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Fingerprint, MessageSquareText, ScanSearch } from 'lucide-react'
 import { WardyStage } from './WardyStage'
 import { ADOPT_PRICE_SKR } from '../../api/_lib/constants'
 
@@ -31,29 +30,23 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
   }
 
   return (
-    <section className="space-y-5 pt-4">
-      <h1 className="text-center text-heading font-semibold">Meet Wardy, your wallet’s guard</h1>
+    <section className="space-y-6 pt-6">
+      <div className="space-y-2 text-center">
+        <h1 className="text-heading font-semibold">Keep your Seeker wallet safe</h1>
+        <p className="text-body text-text-secondary">Wardy finds risky app access, fake tokens and stuck SOL, and fixes them with one tap.</p>
+      </div>
 
-      <WardyStage locked mood="sleepy" line="" state={null} onUnlock={onUnlock} unlocking={connecting} unlockPrice={ADOPT_PRICE_SKR} />
-      {error && <p className="text-center text-body-sm text-critical">{error}</p>}
-
-      <ul className="flex justify-center gap-5 text-caption text-text-secondary">
-        {[
-          { icon: ScanSearch, label: 'Patrol' },
-          { icon: MessageSquareText, label: 'Explain' },
-          { icon: Fingerprint, label: 'Fix' },
-        ].map(({ icon: Icon, label }) => (
-          <li key={label} className="flex items-center gap-1.5">
-            <Icon size={16} className="text-safe" aria-hidden /> {label}
-          </li>
-        ))}
-      </ul>
-
-      <div className="space-y-1 text-center">
-        <Button variant="ghost" className="w-full" onClick={onConnect}>
+      <div className="space-y-2 text-center">
+        <Button className="w-full" onClick={onConnect} loading={connecting}>
           Scan my wallet for free
         </Button>
+        {error && <p className="text-body-sm text-critical">{error}</p>}
         <p className="text-caption text-text-muted">Wardy can’t move your funds or see your seed phrase.</p>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-center text-body-sm font-medium text-text-secondary">Meet Wardy, your wallet’s guard</p>
+        <WardyStage compact locked mood="sleepy" line="" state={null} onUnlock={onUnlock} unlockPrice={ADOPT_PRICE_SKR} />
       </div>
 
       <div className="text-center">
