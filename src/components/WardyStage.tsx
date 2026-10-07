@@ -101,7 +101,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
   }
 
   const shownMood: WardyMood = locked ? 'sleepy' : eating ? 'eating' : (reaction.mood ?? mood)
-  const said = reaction.text ?? (eating ? 'Nom. Got it.' : locked ? 'Zzz… I’m locked in here.' : line)
+  const said = reaction.text ?? (eating ? 'Nom nom. Checking everything…' : locked ? 'Zzz… I’m locked in here.' : line)
   const span = state?.nextLevelXp ? state.nextLevelXp - state.levelXp : 1
   const progress = state ? (state.nextLevelXp ? Math.min(1, (state.xp - state.levelXp) / span) : 1) : 0
 

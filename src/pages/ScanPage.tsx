@@ -47,7 +47,7 @@ function summaryLine(findings: Finding[], readOnly: boolean) {
 
 /** Wardy's own short line, by mood. */
 function moodLine(mood: WardyMood, fed: boolean) {
-  if (!fed) return 'I’m hungry. Scan your wallet to feed me.'
+  if (!fed) return 'I’m hungry. Scan your wallet to feed me. Clean ones taste best.'
   switch (mood) {
     case 'happy':
       return 'All quiet on my patrol.'
@@ -91,7 +91,16 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
     setEating(true)
     window.setTimeout(() => setEating(false), 2200)
     setGained(r.gained)
-    toast('success', r.napped ? 'Wardy woke up and ate your scan.' : 'Wardy ate today’s scan. Yum.')
+    const urgent = visible.filter((f) => f.severity !== 'cleanup').length
+    toast(
+      'success',
+      r.clean
+        ? `Spotless! Wardy ate a clean-wallet treat. +${r.gained} XP`
+        : urgent
+          ? `Wardy ate your scan and found ${urgent} thing${urgent === 1 ? '' : 's'} to fix. +${r.gained} XP`
+          : `Wardy ate your scan. +${r.gained} XP`,
+    )
+    if (r.napped) toast('info', 'He was napping. Welcome back.')
       if (r.levelUp) {
         celebrate('big')
         toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)

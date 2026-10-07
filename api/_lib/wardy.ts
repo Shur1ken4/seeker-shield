@@ -14,6 +14,8 @@ export const LEVELS: { xp: number; name: string }[] = [
 ]
 
 export const PATROL_XP = 10
+/** A safe wallet is the best meal: bonus XP when the day's scan comes back clean (score 90+). */
+export const CLEAN_TREAT_XP = 5
 export const SNACK_XP = 5
 export const SNACKS_PER_DAY = 6 // so airdropping yourself spam to "feed" Wardy earns nothing extra
 export const STREAK_FOR_REWARD = 7
@@ -70,12 +72,12 @@ export async function getWardy(address: string) {
 }
 
 /** Pure step function for a daily patrol, so the rules are unit-testable. */
-export function applyPatrol(r: WardyRecord, now = Date.now()) {
+export function applyPatrol(r: WardyRecord, now = Date.now(), clean = false) {
   const today = dayOf(now)
-  if (r.lastPatrol === today) return { record: r, gained: 0, already: true, reward: false, napped: false }
+  if (r.lastPatrol === today) return { record: r, gained: 0, already: true, reward: false, napped: false, clean: false }
   const gap = r.lastPatrol ? daysBetween(r.lastPatrol, today) : null
   const streak = gap === 1 ? r.streak + 1 : 1
-  const gained = PATROL_XP + Math.min(streak - 1, 10)
+  const gained = PATROL_XP + Math.min(streak - 1, 10) + (clean ? CLEAN_TREAT_XP : 0)
   const reward = streak % STREAK_FOR_REWARD === 0
   const record: WardyRecord = {
     ...r,
@@ -85,7 +87,7 @@ export function applyPatrol(r: WardyRecord, now = Date.now()) {
     lastPatrol: today,
     rewards: r.rewards + (reward ? 1 : 0),
   }
-  return { record, gained, already: false, reward, napped: gap !== null && gap > 1 }
+  return { record, gained, already: false, reward, napped: gap !== null && gap > 1, clean }
 }
 
 export function applySnacks(r: WardyRecord, count: number, now = Date.now()) {
@@ -97,11 +99,13 @@ export function applySnacks(r: WardyRecord, count: number, now = Date.now()) {
 
 export async function patrol(address: string) {
   const r = await load(address)
-  const res = applyPatrol(r)
-  if (res.already) return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false }
+  // Clean-wallet treat: judged from the server's own latest scan of this wallet, never from the client.
+  const scan = await kv.get<{ score: number }>(`scan:${address}`)
+  const res = applyPatrol(r, Date.now(), (scan?.score ?? 0) >= 90)
+  if (res.already) return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false, clean: false }
   // One patrol per day per wallet, even if two requests race.
   if (!(await kv.set(`wardy:patrol:${address}:${res.record.lastPatrol}`, 1, { ex: 2 * 86400, nx: true }))) {
-    return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false }
+    return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false, clean: false }
   }
   await kv.set(`wardy:${address}`, res.record)
   if (res.reward) await extendPro(address, REWARD_PRO_DAYS)
@@ -112,6 +116,7 @@ export async function patrol(address: string) {
     rewardProDays: res.reward ? REWARD_PRO_DAYS : 0,
     napped: res.napped,
     levelUp: levelFor(res.record.xp).level > levelFor(r.xp).level,
+    clean: res.clean,
   }
 }
 

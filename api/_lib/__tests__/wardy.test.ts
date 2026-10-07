@@ -43,6 +43,13 @@ describe('Wardy patrols', () => {
     expect(applySnacks(a.record, 3, day('2026-10-08')).eaten).toBe(3)
   })
 
+  it('gives a bonus treat when the day’s scan is clean', () => {
+    const plain = applyPatrol(fresh, day('2026-10-07'))
+    const clean = applyPatrol(fresh, day('2026-10-07'), true)
+    expect(clean.gained - plain.gained).toBe(5)
+    expect(clean.clean).toBe(true)
+  })
+
   it('maps XP to levels', () => {
     expect(levelFor(0).name).toBe('Pup')
     expect(levelFor(50).name).toBe('Scout')
