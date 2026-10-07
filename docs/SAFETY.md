@@ -1,4 +1,4 @@
-# Seeker Shield safety report
+# Wardy safety report
 
 A security app has to be safer than the wallets it protects. This is the review we ran on our own code, acting as a strict auditor, and what we changed as a result.
 
@@ -30,7 +30,10 @@ A security app has to be safer than the wallets it protects. This is the review 
 | 14 | **Read-only by default.** Scanning, watching friends, and alerts never ask for a signature. Watched wallets are read-only. | Pass |
 | 15 | **Honest numbers.** "SOL reclaimed" and "issues fixed" are counted by the server from the confirmed transaction on-chain, not reported by the app. | Pass |
 
+| 16 | **Test mode can't leak into real payments.** `/api/pro/test-unlock` works only while `PAYMENTS_TEST_MODE=true` on the server, needs a signed-in wallet, and the app labels it "Test mode: no SKR is charged". | Pass |
+| 17 | **Pet rewards can't be farmed.** Patrols need a signed-in, adopted wallet and count once per day (atomic). Snack XP comes only from fixes the server verified on-chain, capped at 6 a day. Streak rewards are free Pro days, never tokens. | Pass (`wardy.test.ts`) |
+
 ## Known, accepted
 
-- `npm audit` reports advisories in `bigint-buffer` (through `@solana/spl-token`) and in `jayson`/`uuid` (through `@solana/web3.js` v1). Fixing them would require web3.js v3 or a 2021 spl-token. We use neither library on attacker-supplied binary buffers, and we'll migrate after the hackathon.
+- `npm audit` reports advisories in `bigint-buffer` (through `@solana/spl-token`) and in `jayson`/`uuid` (through `@solana/web3.js` v1). Fixing them would require web3.js v3 or a 2021 spl-token. `rpc-websockets` is pinned to `uuid@11` (CommonJS) so the serverless runtime can load it. We use none of these libraries on attacker-supplied binary buffers, and we'll migrate after the hackathon.
 - Sessions are bearer tokens in `localStorage`, valid for 24 hours. The strict CSP (no inline or third-party scripts) is the defence against them being stolen.

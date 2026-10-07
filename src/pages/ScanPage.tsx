@@ -19,6 +19,7 @@ import { PENDING_ADOPT } from '@/components/ConnectHero'
 import { AdoptSheet } from '@/components/AdoptSheet'
 import { Wardy, moodForScore, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
+import { celebrate } from '@/lib/celebrate'
 import type { FixItem } from '@/lib/fixes'
 import { short, sol, timeAgo } from '@/lib/format'
 import { useExplanations, useHidden, useScan } from '@/lib/useScan'
@@ -86,15 +87,25 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   const feed = async () => {
     setFeeding(true)
     try {
+      if (!hasSession) await signIn()
       await rescan()
       const r = await wardy.patrol()
-      if (!r || r.already) return
+      if (!r) return toast('error', 'Wardy couldn’t start his patrol. Try again in a moment.')
+      if (r.already) return
       setEating(true)
       window.setTimeout(() => setEating(false), 2200)
       setGained(r.gained)
       toast('success', r.napped ? 'Wardy woke up and ate. Patrol done.' : 'Patrol done. Wardy’s fed.')
-      if (r.levelUp) toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)
-      if (r.rewardProDays) toast('success', `${r.state.streak}-day streak. ${r.rewardProDays} free Pro days.`)
+      if (r.levelUp) {
+        celebrate('big')
+        toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)
+      }
+      if (r.rewardProDays) {
+        celebrate('big')
+        toast('success', `${r.state.streak}-day streak. ${r.rewardProDays} free Pro days.`)
+      }
+    } catch (e) {
+      toast('error', (e as Error).message)
     } finally {
       setFeeding(false)
     }
@@ -176,7 +187,6 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           </div>
           <div className="space-y-2">
             <p className="text-body font-medium">Wardy is patrolling…</p>
-            
           </div>
         </div>
       ) : data ? (
@@ -303,6 +313,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
         open={adoptOpen}
         onClose={() => setAdoptOpen(false)}
         onAdopted={() => {
+          celebrate('big')
           wardy.refresh()
           toast('success', 'Wardy is yours. First patrol starting.')
         }}
@@ -324,6 +335,8 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           toast('success', r.reclaimedLamports > 0 ? `Done. ${sol(r.reclaimedLamports)} is back in your wallet.` : 'Done. Your wallet is safer.')
           // Update the score now; markFixed also re-checks the chain a few times in the background.
           markFixed(r.fixedIds)
+          // A perfect wallet deserves a moment.
+          if (r.fixedIds.length >= visible.length) celebrate('small')
           // Wardy eats what was fixed; the server adds snack XP once it has verified the fix on-chain.
           setEating(true)
           window.setTimeout(() => setEating(false), 2600)

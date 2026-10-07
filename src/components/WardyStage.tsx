@@ -50,6 +50,18 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
   }, [])
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
+  // When nobody is touching him, Wardy glances around now and then.
+  const touching = useRef(false)
+  useEffect(() => {
+    if (locked) return
+    const id = window.setInterval(() => {
+      if (touching.current) return
+      const r = Math.random()
+      setLook(r < 0.33 ? { x: -0.8, y: 0.1 } : r < 0.66 ? { x: 0.8, y: -0.1 } : { x: 0, y: 0 })
+    }, 3200)
+    return () => window.clearInterval(id)
+  }, [locked])
+
   const burstHearts = () => {
     const now = Date.now()
     setHearts((h) => [...h, ...[0, 1, 2].map((i) => ({ id: now + i, x: -30 + Math.random() * 60 }))])
@@ -57,6 +69,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
   }
 
   const onMove = (e: PointerEvent<HTMLDivElement>) => {
+    touching.current = true
     const r = stageRef.current?.getBoundingClientRect()
     if (!r) return
     setLook({ x: (e.clientX - (r.left + r.width / 2)) / (r.width / 2), y: (e.clientY - (r.top + r.height / 2)) / (r.height / 2) })
@@ -78,10 +91,10 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
     press.current = { x: e.clientX, y: e.clientY, travel: 0, loved: false }
   }
 
-  const onUp = () => {
+  const onUp = (fromKeyboard = false) => {
     const p = press.current
     press.current = null
-    if (!p || p.loved || p.travel > 20) return
+    if (!fromKeyboard && (!p || p.loved || p.travel > 20)) return
     buzz()
     if (locked) return react({ mood: null, text: LOCKED_LINES[Math.floor(Math.random() * LOCKED_LINES.length)], anim: 'wardy-react-wiggle' })
     react({ mood: Math.random() < 0.5 ? 'excited' : 'happy', text: TAP_LINES[Math.floor(Math.random() * TAP_LINES.length)], anim: 'wardy-react-jump' }, 1400)
@@ -106,17 +119,18 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
         className={cn('relative mx-auto mt-2 flex touch-none select-none items-end justify-center', compact ? 'h-[170px]' : 'h-[210px]')}
         onPointerMove={onMove}
         onPointerDown={onDown}
-        onPointerUp={onUp}
+        onPointerUp={() => onUp()}
         onPointerLeave={() => {
+          touching.current = false
           press.current = null
           setLook({ x: 0, y: 0 })
         }}
         role="button"
         tabIndex={0}
         aria-label={locked ? 'Wardy is locked. Tap to wake him.' : 'Play with Wardy: tap him or rub him'}
-        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onUp()}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onUp(true)}
       >
-        <span aria-hidden className="absolute bottom-3 h-3 w-28 rounded-full bg-bg/60" />
+        <span aria-hidden className="absolute bottom-4 h-2 w-20 rounded-full bg-bg/40" />
         <div key={reaction.anim} className={cn('relative mb-5', reaction.anim.split(' ')[0])}>
           <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} />
         </div>
