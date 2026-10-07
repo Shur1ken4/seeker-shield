@@ -21,7 +21,7 @@ export function WardyPatrol({
       <div className="flex items-center gap-3 rounded-card border border-border bg-surface-1 p-4">
         <div className="flex-1">
           <p className="text-body-sm font-medium">Start Wardy’s daily patrol</p>
-          <p className="text-caption text-text-secondary">Open the app each day to keep him fed, grow his level and earn free Pro days.</p>
+          <p className="text-caption text-text-secondary">Visit daily, earn free Pro days.</p>
         </div>
         <Button size="sm" onClick={onStart} loading={starting}>
           Start
@@ -56,10 +56,9 @@ export function WardyPatrol({
         <span className="inline-flex items-center gap-1 text-text-secondary">
           <Flame size={14} className={state.streak ? 'text-warning' : 'text-text-muted'} aria-hidden />
           {state.streak ? `${state.streak}-day streak` : 'No streak yet'}
-          {state.patrolledToday ? ' · fed today' : ''}
         </span>
         <span className="inline-flex items-center gap-1 text-text-muted">
-          <Gift size={14} aria-hidden /> {state.daysToReward} day{state.daysToReward === 1 ? '' : 's'} to 3 free Pro days
+          <Gift size={14} aria-hidden /> Free Pro in {state.daysToReward} day{state.daysToReward === 1 ? '' : 's'}
         </span>
       </div>
     </div>

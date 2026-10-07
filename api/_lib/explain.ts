@@ -14,21 +14,21 @@ export function template(f: Pick<Finding, 'type' | 'severity' | 'symbol' | 'name
   switch (f.type) {
     case 'delegation':
       return f.severity === 'critical'
-        ? `An app you once approved can still move your ${token} without asking. Removing its access stops that.`
-        : `An app you once approved can still move your ${token}. Removing its access stops that; your tokens stay put.`
+        ? `An app you once approved can take your ${token} anytime. Remove its access.`
+        : `An app you once approved can still move your ${token}. Removing access stops it.`
     case 'scam_match':
-      return `This is linked to an address on our scam list. Don’t visit any site it mentions; fixing it cuts that link to your wallet.`
+      return `Linked to a known scammer. Don’t visit any site it mentions.`
     case 'suspicious':
-      return `Someone sent you this worthless token to lure you to a website. Don’t visit it; hiding it is safe.`
+      return `Worthless bait to lure you to a fake website. Don’t visit it; hide it.`
     case 'empty':
-      return `This old ${token} account is empty but still holds a little of your SOL. Closing it sends that SOL back to you.`
+      return `Empty, but still holding a little of your SOL. Close it to get it back.`
   }
 }
 
 const SYSTEM = `You write one-sentence safety explanations for a phone wallet security app used by non-technical people.
 
 Rules:
-- Exactly one sentence, at most 25 words, plain English, no jargon (say "access", not "delegate", "approval" or "permission"; "account", not "ATA"; "SOL held in the account", not "rent").
+- Exactly one short sentence, at most 15 words, plain English, no jargon (say "access", not "delegate", "approval" or "permission"; "account", not "ATA"; "SOL held in the account", not "rent").
 - Say what could happen and what the fix does.
 - Never claim more certainty than the severity label. Never use the word "scam" unless the finding type is "scam_match".
 - No emoji, no exclamation marks.
@@ -56,7 +56,7 @@ export function acceptable(text: unknown, type: FindingType): text is string {
   return true
 }
 
-const cacheKey = (f: { type: FindingType; mint: string; severity: Severity }) => `explain:v2:${f.type}:${f.mint}:${f.severity}`
+const cacheKey = (f: { type: FindingType; mint: string; severity: Severity }) => `explain:v3:${f.type}:${f.mint}:${f.severity}`
 
 async function askClaude(items: ExplainInput[]): Promise<Record<string, string>> {
   const payload = items.map((f) => ({

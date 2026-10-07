@@ -23,15 +23,15 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
         <Wardy mood="happy" size={64} />
         <h1 className="text-heading font-semibold">Your keys are safe. Is your wallet?</h1>
         <p className="text-body text-text-secondary">
-          Meet Wardy. He patrols your wallet for the 3 things drainers use, explains each one in plain English, and fixes it with your fingerprint.
+          Meet Wardy. He finds what drainers use and fixes it with your fingerprint.
         </p>
       </div>
 
       <ol className="space-y-3">
         {[
-          { icon: ScanSearch, title: 'Patrol', text: 'Wardy checks what can touch your tokens.' },
-          { icon: MessageSquareText, title: 'Understand', text: 'One plain sentence per problem.' },
-          { icon: Fingerprint, title: 'Fix', text: 'One tap, one fingerprint. Wardy eats the trash.' },
+          { icon: ScanSearch, title: 'Patrol', text: 'He checks your wallet.' },
+          { icon: MessageSquareText, title: 'Explain', text: 'In plain English.' },
+          { icon: Fingerprint, title: 'Fix', text: 'One tap, one fingerprint.' },
         ].map(({ icon: Icon, title, text }, i) => (
           <li key={title} className="flex items-center gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-safe/[.14] text-safe">
@@ -52,7 +52,7 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
           Scan my wallet
         </Button>
         {error && <p className="text-body-sm text-critical">{error}</p>}
-        <p className="text-caption text-text-muted">Free and read-only. Wardy can’t move your funds, and never asks for your seed phrase.</p>
+        <p className="text-caption text-text-muted">Free. Wardy can’t move your funds or see your seed phrase.</p>
       </div>
 
       <div>

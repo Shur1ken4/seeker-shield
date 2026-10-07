@@ -33,12 +33,12 @@ const GROUPS: { severity: Severity; label: string; hint: string }[] = [
 
 /** What Wardy says about the wallet, in his own voice. */
 function summaryLine(findings: Finding[], readOnly: boolean) {
-  if (!findings.length) return readOnly ? 'All quiet in this wallet. Nothing can drain it right now.' : 'All quiet. Nothing can drain your wallet right now.'
+  const whose = readOnly ? 'this' : 'your'
+  if (!findings.length) return `All quiet. Nothing can drain ${whose} wallet.`
   const urgent = findings.filter((f) => f.severity !== 'cleanup').length
   const tidy = findings.length - urgent
-  const accounts = `${tidy} old account${tidy === 1 ? '' : 's'} holding SOL`
-  if (!urgent) return readOnly ? `This wallet is safe. I found ${accounts} its owner can get back.` : `You’re safe. I found ${accounts} you can get back.`
-  return `I found ${urgent} thing${urgent === 1 ? '' : 's'} that need${urgent === 1 ? 's' : ''} ${readOnly ? 'attention' : 'your attention'}${tidy ? `, plus ${tidy} to tidy up` : ''}.`
+  if (urgent) return `I found ${urgent} thing${urgent === 1 ? '' : 's'} to fix.`
+  return readOnly ? `Safe. ${tidy} old account${tidy === 1 ? ' is' : 's are'} holding SOL.` : `You’re safe. ${tidy} old account${tidy === 1 ? ' holds' : 's hold'} SOL for you.`
 }
 
 export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoToWatch?: () => void }) {
@@ -124,7 +124,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           </div>
           <div className="space-y-2">
             <p className="text-body font-medium">Wardy is patrolling…</p>
-            <p className="text-body-sm text-text-secondary">Checking every token, app access and old account.</p>
+            
           </div>
         </div>
       ) : data ? (
@@ -157,14 +157,13 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
             Fix {fixAll.length} issue{fixAll.length === 1 ? '' : 's'}
           </Button>
           <p className="text-caption text-text-muted">
-            {fixAll.some((i) => i.action === 'revoke') ? 'Removes app access' : 'Closes old accounts'}
-            {fixAllReclaim > 0 ? ` and returns about ${sol(fixAllReclaim)} to you` : ''}. Your tokens don’t move.
+            {fixAllReclaim > 0 ? `Returns about ${sol(fixAllReclaim)}. ` : ''}Your tokens don’t move.
           </p>
         </div>
       )}
 
       {data && readOnly && visible.length > 0 && (
-        <p className="rounded-chip bg-surface-1 p-3 text-body-sm text-text-secondary">You’re viewing someone else’s wallet. Only its owner can fix these, from their own phone.</p>
+        <p className="rounded-chip bg-surface-1 p-3 text-body-sm text-text-secondary">Read-only. Only the owner can fix these.</p>
       )}
 
       {loading && !data && (
@@ -199,7 +198,6 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           <div key={severity} className="space-y-3">
             <h2 className="flex items-baseline gap-2 text-body-sm font-medium text-text-secondary">
               {label} <span className="text-caption text-text-muted">{items.length}</span>
-              <span className="ml-auto text-caption font-normal text-text-muted">{GROUPS.find((g) => g.severity === severity)!.hint}</span>
             </h2>
             {items.map((f) => {
               const { primary, secondary } = actionsFor(f)

@@ -39,12 +39,15 @@ export function FindingCard({
   primary,
   secondary,
   busy,
+  showChip = false,
 }: {
   finding: Finding
   explanation?: string
   primary?: FindingAction
   secondary?: FindingAction[]
   busy?: boolean
+  /** Off on the Scan tab, where the group heading already says Fix now / Check this / Tidy up. */
+  showChip?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const chip: ChipKind = finding.type === 'suspicious' ? 'suspicious' : finding.severity
@@ -67,7 +70,7 @@ export function FindingCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="min-w-0 break-words text-body font-medium">{title[finding.type](finding)}</h3>
-            <SeverityChip kind={chip} />
+            {showChip && <SeverityChip kind={chip} />}
           </div>
           {explanation ? (
             <p className="mt-1 text-body-sm text-text-secondary">{explanation}</p>

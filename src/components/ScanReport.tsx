@@ -46,7 +46,7 @@ export function ScanReport({ data, findings, defaultOpen = true }: { data: ScanR
     {
       label: 'Old empty accounts',
       ok: !empty.length,
-      okText: 'None, no SOL is stuck',
+      okText: 'None',
       badText: `${plural(empty.length, 'account')} holding ${sol(emptyRent)} you can get back`,
       tone: 'cleanup',
     },
@@ -65,8 +65,7 @@ export function ScanReport({ data, findings, defaultOpen = true }: { data: ScanR
         <div className="flex-1">
           <h2 className="text-body font-medium">What Wardy checked</h2>
           <p className="mt-1 text-body-sm text-text-secondary">
-            {plural(n, 'token account')} and your SOL balance, read live from Solana
-            {data.durationMs ? ` in ${(data.durationMs / 1000).toFixed(1)} s` : ''}.
+            {plural(n, 'token')} and your SOL, live from Solana.
           </p>
         </div>
         <ChevronDown size={18} className={cn('mt-1 shrink-0 text-text-muted transition-transform duration-fast', expanded && 'rotate-180')} aria-hidden />
@@ -93,7 +92,7 @@ export function ScanReport({ data, findings, defaultOpen = true }: { data: ScanR
           <div>
             <p className="text-body-sm font-medium">SOL balance</p>
             <p className="text-body-sm text-text-secondary">
-              <span className="font-mono">{sol(data.solLamports ?? 0)}</span> · never touched by any fix
+              <span className="font-mono">{sol(data.solLamports ?? 0)}</span> · never touched
             </p>
           </div>
         </li>
