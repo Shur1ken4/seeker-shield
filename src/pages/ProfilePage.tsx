@@ -66,7 +66,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
 
       {wardy.state && (
         <div className="flex items-center gap-4 rounded-card border border-border bg-surface-1 p-4">
-          <Wardy mood={wardy.state.sleepy ? 'sleepy' : 'happy'} size={72} />
+          <Wardy mood={wardy.state.sleepy ? 'sleepy' : 'happy'} size={72} level={wardy.state.level} />
           <div className="min-w-0 flex-1">
             <p className="font-brand text-title font-extrabold">Wardy</p>
             <p className="text-body-sm text-text-secondary">
@@ -77,6 +77,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
               {wardy.state.streak}-day streak · best {wardy.state.bestStreak}
               {wardy.state.rewards ? ` · ${wardy.state.rewards * 3} free Pro days earned` : ''}
             </p>
+            <p className="mt-1 text-caption text-safe">{nextEvolution(wardy.state.level)}</p>
           </div>
         </div>
       )}
@@ -117,4 +118,13 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
       </div>
     </section>
   )
+}
+
+/** What Wardy gets next as he levels up (cosmetic evolution, like Sanctum's pets). */
+function nextEvolution(level: number) {
+  if (level < 2) return 'Next: a star badge at level 2'
+  if (level < 4) return 'Next: a knight’s plume at level 4'
+  if (level < 5) return 'Next: a guardian glow at level 5'
+  if (level < 6) return 'Next: the Legend crown at level 6'
+  return 'Fully evolved. Legend.'
 }

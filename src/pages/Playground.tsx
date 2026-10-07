@@ -34,6 +34,14 @@ export function Playground() {
         }}
       />
       <WardyStage compact locked mood="sleepy" line="" state={null} unlockPrice={50} onUnlock={() => celebrate('big')} />
+      <div className="flex items-end justify-around rounded-card border border-border bg-surface-1 p-4">
+        {[1, 2, 4, 5, 6].map((lv) => (
+          <div key={lv} className="flex flex-col items-center gap-1">
+            <Wardy mood="happy" size={48} level={lv} />
+            <span className="text-caption text-text-muted">Lv {lv}</span>
+          </div>
+        ))}
+      </div>
       <div className="grid grid-cols-4 gap-3 rounded-card border border-border bg-surface-1 p-4">
         {MOODS.map((m) => (
           <div key={m} className="flex flex-col items-center gap-1">

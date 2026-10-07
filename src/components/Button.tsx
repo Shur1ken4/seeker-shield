@@ -2,13 +2,15 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { cn } from '@/lib/cn'
 import { Spinner } from './Spinner'
 
-type Variant = 'primary' | 'secondary' | 'destructive' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'destructive' | 'ghost' | 'reward'
 
 const variants: Record<Variant, string> = {
   primary: 'bg-safe text-on-safe active:bg-safe/80',
   secondary: 'border border-border text-text-primary active:bg-surface-2',
   destructive: 'bg-critical text-on-safe active:bg-critical/80',
   ghost: 'text-text-secondary active:bg-surface-2',
+  // Special offers only (Unlock Wardy): mint gradient, slow shine, soft glow. Never for ordinary actions.
+  reward: 'btn-reward text-on-safe active:brightness-95',
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

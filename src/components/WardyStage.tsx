@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
-import { Check, Flame, Lock, Utensils } from 'lucide-react'
+import { Check, Flame, Lock, Sparkles, Utensils } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Button } from './Button'
 import { Wardy, type WardyMood } from './Wardy'
@@ -106,7 +106,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
   const progress = state ? (state.nextLevelXp ? Math.min(1, (state.xp - state.levelXp) / span) : 1) : 0
 
   return (
-    <div className="rounded-card border border-border bg-surface-1 p-4">
+    <div className={cn('rounded-card border bg-surface-1 p-4', locked ? 'border-safe/40 shadow-[0_0_28px_-8px_rgb(var(--safe)/0.45)]' : 'border-border')}>
       {/* Speech bubble */}
       <div className="relative mx-auto w-fit max-w-full rounded-card bg-surface-2 px-4 py-2 text-center" aria-live="polite">
         <p className="text-body-sm text-text-primary">{said}</p>
@@ -140,7 +140,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
               transformStyle: 'preserve-3d',
             }}
           >
-            <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} />
+            <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} level={locked ? 1 : state?.level} />
           </div>
         </div>
 
@@ -172,8 +172,8 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
 
       {locked ? (
         <div className="space-y-2">
-          <Button className="w-full" variant={compact ? 'secondary' : 'primary'} onClick={onUnlock} loading={unlocking}>
-            <Lock size={18} aria-hidden /> Unlock Wardy · {unlockPrice} SKR
+          <Button className="w-full" variant="reward" onClick={onUnlock} loading={unlocking}>
+            <Sparkles size={18} aria-hidden /> Unlock Wardy · {unlockPrice} SKR
           </Button>
           <p className="text-center text-caption text-text-muted">One time, about $0.90. Daily patrols, streaks and alerts.</p>
         </div>

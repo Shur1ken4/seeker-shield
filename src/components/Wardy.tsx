@@ -25,12 +25,15 @@ export function Wardy({
   size = 96,
   look,
   grey,
+  level = 1,
   className,
 }: {
   mood?: WardyMood
   size?: number
   look?: { x: number; y: number }
   grey?: boolean
+  /** Evolution gear: Scout 2+ star badge, Knight 4+ plume, Sentinel 5+ glow, Legend 6 crown. */
+  level?: number
   className?: string
 }) {
   const tone = grey || mood === 'sleepy' ? 'cleanup' : mood === 'alarmed' ? 'warning' : 'safe'
@@ -63,11 +66,17 @@ export function Wardy({
           <stop offset="0%" style={{ stopColor: `color-mix(in srgb, ${base} 55%, black)` }} />
           <stop offset="100%" style={{ stopColor: `color-mix(in srgb, ${base} 35%, black)` }} />
         </linearGradient>
+        <radialGradient id={`${id}-aura`}>
+          <stop offset="55%" style={{ stopColor: base }} stopOpacity="0.35" />
+          <stop offset="100%" style={{ stopColor: base }} stopOpacity="0" />
+        </radialGradient>
         <linearGradient id={`${id}-shine`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="white" stopOpacity="0.55" />
           <stop offset="100%" stopColor="white" stopOpacity="0" />
         </linearGradient>
       </defs>
+
+      {level >= 5 && <ellipse cx="60" cy="72" rx="78" ry="84" className="wardy-aura" fill={`url(#${id}-aura)`} />}
 
       <g className="wardy-body">
         {/* Thickness: the shield's side wall, peeking out below and beside the face. */}
@@ -76,6 +85,17 @@ export function Wardy({
         {/* Rim light along the top edge, then a soft glossy reflection. */}
         <path d="M60 3C45 12 27 18 4 18" fill="none" stroke="white" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
         <path d="M14 26C14 22 28 20 42 17C34 30 24 44 16 58C14 48 14 36 14 26Z" fill={`url(#${id}-shine)`} />
+
+        {/* Evolution gear */}
+        {level >= 2 && (
+          <path d="M60 110l3.2 6.6 7.3 1-5.3 5.1 1.3 7.2-6.5-3.4-6.5 3.4 1.3-7.2-5.3-5.1 7.3-1z" fill="#F5D76E" stroke="#B8901F" strokeWidth="1.2" />
+        )}
+        {level >= 4 && level < 6 && (
+          <path d="M60 2C56 -10 62 -22 74 -24C70 -16 72 -8 66 0Z" fill="#FF7A6B" stroke="#C9483A" strokeWidth="1.2" />
+        )}
+        {level >= 6 && (
+          <path d="M40 2L44 -14L52 -4L60 -18L68 -4L76 -14L80 2Z" fill="#F5D76E" stroke="#B8901F" strokeWidth="1.5" strokeLinejoin="round" />
+        )}
 
         {/* The face shifts toward wherever Wardy is looking. */}
         <g style={{ transform: `translate(${lx}px, ${ly}px)`, transition: 'transform 120ms ease-out' }}>

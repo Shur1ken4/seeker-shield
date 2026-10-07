@@ -143,3 +143,27 @@ body {
   20% { opacity: 1; transform: translateY(-10px) scale(1); }
   100% { opacity: 0; transform: translateY(-70px) scale(1.1); }
 }
+
+/* Reward button: a gradient that shines now and then, plus a soft breathing glow. */
+.btn-reward {
+  background: linear-gradient(120deg, rgb(var(--safe)) 0%, color-mix(in srgb, rgb(var(--safe)) 70%, #9ff5d0) 50%, rgb(var(--safe)) 100%);
+  box-shadow: 0 0 0 0 rgb(var(--safe) / 0.45);
+  overflow: hidden;
+  animation: reward-glow 2.6s ease-in-out infinite;
+}
+.btn-reward::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: reward-shine 3.2s ease-in-out infinite;
+}
+@keyframes reward-shine {
+  0%, 55% { transform: translateX(-120%); }
+  85%, 100% { transform: translateX(120%); }
+}
+@keyframes reward-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--safe) / 0.35); }
+  50% { box-shadow: 0 0 22px 2px rgb(var(--safe) / 0.35); }
+}
