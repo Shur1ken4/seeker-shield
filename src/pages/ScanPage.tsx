@@ -15,6 +15,7 @@ import { DemoPermission } from '@/components/DemoPermission'
 import { forgetWallet, useSession } from '@/lib/wallet'
 import { useWardy } from '@/lib/useWardy'
 import { WardyPatrol } from '@/components/WardyPatrol'
+import { AdoptSheet } from '@/components/AdoptSheet'
 import { Wardy, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
 import type { FixItem } from '@/lib/fixes'
@@ -22,6 +23,7 @@ import { short, sol, timeAgo } from '@/lib/format'
 import { useExplanations, useHidden, useScan } from '@/lib/useScan'
 import { blockReason, defaultAction } from '../../api/_lib/guard'
 import { computeScore } from '../../api/_lib/score'
+import { ADOPT_PRICE_SKR } from '../../api/_lib/constants'
 import type { Finding, Severity } from '../../api/_lib/types'
 
 // Grouped by what to do, not just how bad it is (the coloured chips still carry severity).
@@ -60,10 +62,12 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   const wardy = useWardy(readOnly ? null : owner)
   const [eating, setEating] = useState(false)
   const [gained, setGained] = useState<number | null>(null)
+  const [adoptOpen, setAdoptOpen] = useState(false)
+  const adopted = !!wardy.state?.adopted
 
   // Wardy's daily patrol: once the user's own wallet has been scanned, count today's meal.
   useEffect(() => {
-    if (readOnly || !data || !hasSession) return
+    if (readOnly || !data || !hasSession || !adopted) return
     wardy.patrol().then((r) => {
       if (!r || r.already) return
       setGained(r.gained)
@@ -72,7 +76,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
       if (r.rewardProDays) toast('success', `${r.state.streak}-day streak. You earned ${r.rewardProDays} free days of Wardy Pro.`)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readOnly, data?.scannedAt, hasSession])
+  }, [readOnly, data?.scannedAt, hasSession, adopted])
 
   const visible = useMemo(() => data?.findings.filter((f) => !hidden.has(f.mint)) ?? [], [data, hidden])
   const hiddenCount = (data?.findings.length ?? 0) - visible.length
@@ -138,10 +142,21 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           {!readOnly && (
             <WardyPatrol
               state={wardy.state}
-              needsSession={!hasSession}
+              needsAdoption={!!wardy.state && !adopted}
+              adoptPrice={ADOPT_PRICE_SKR}
               starting={signingIn}
               gained={gained}
-              onStart={() => signIn().catch((e) => toast('error', (e as Error).message))}
+              onAdopt={async () => {
+                // The payment is credited to the wallet that proved ownership, so sign in first.
+                if (!hasSession) {
+                  try {
+                    await signIn()
+                  } catch (e) {
+                    return toast('error', (e as Error).message)
+                  }
+                }
+                setAdoptOpen(true)
+              }}
             />
           )}
         </div>
@@ -232,6 +247,15 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
       )}
 
       {!readOnly && data && <DemoPermission onDone={rescan} />}
+
+      <AdoptSheet
+        open={adoptOpen}
+        onClose={() => setAdoptOpen(false)}
+        onAdopted={() => {
+          wardy.refresh()
+          toast('success', 'Wardy is yours. First patrol starting.')
+        }}
+      />
 
       <BurnSheet
         finding={burnTarget}

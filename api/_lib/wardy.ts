@@ -66,7 +66,7 @@ async function load(address: string) {
 }
 
 export async function getWardy(address: string) {
-  return toState(await load(address))
+  return { ...toState(await load(address)), adopted: !!(await kv.get(`adopted:${address}`)) }
 }
 
 /** Pure step function for a daily patrol, so the rules are unit-testable. */
@@ -116,7 +116,7 @@ export async function patrol(address: string) {
 }
 
 export async function feedSnacks(address: string, count: number) {
-  if (count <= 0) return 0
+  if (count <= 0 || !(await kv.get(`adopted:${address}`))) return 0
   const r = await load(address)
   const res = applySnacks(r, count)
   if (res.eaten) await kv.set(`wardy:${address}`, res.record)

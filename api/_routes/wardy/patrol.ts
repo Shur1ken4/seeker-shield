@@ -1,6 +1,7 @@
 import { fail, json, rateLimit } from '../../_lib/http.js'
 import { getSession } from '../../_lib/session.js'
 import { patrol } from '../../_lib/wardy.js'
+import { isAdopted } from '../../_lib/pro.js'
 
 /**
  * Wardy's daily patrol (his "meal"): counted once per day for the wallet that proved ownership.
@@ -11,5 +12,6 @@ export async function POST(req: Request) {
   if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Prove it’s your wallet to start Wardy’s patrols.', 401)
+  if (!(await isAdopted(s.address))) return fail('Adopt Wardy to start his daily patrols.', 402)
   return json(await patrol(s.address))
 }

@@ -3,6 +3,7 @@ import { kv } from '../_lib/kv.js'
 import { getSession } from '../_lib/session.js'
 import { isSkrName, resolveSkr } from '../_lib/skr.js'
 import { syncHeliusWebhook } from '../_lib/helius.js'
+import { isAdopted } from '../_lib/pro.js'
 import { scanWallet } from '../_lib/scan.js'
 import { addWatcher, getAlerts, getWatched, isPro, removeWatcher, setWatched, watchLimit } from '../_lib/watch.js'
 
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
       }
     }),
   )
-  return json({ telegram: { linked: !!chatId }, watched: withScores, alerts, pro, limit })
+  return json({ telegram: { linked: !!chatId }, watched: withScores, alerts, pro, limit, adopted: await isAdopted(s.address) })
 }
 
 export async function POST(req: Request) {
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
   if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Please verify your wallet first.', 401)
+  if (!(await isAdopted(s.address))) return fail('Adopt Wardy to watch friends’ wallets.', 402)
   const body = await readJson<{ target?: string; nickname?: string }>(req)
   const target = body?.target?.trim() ?? ''
   const nickname = (body?.nickname ?? '').trim().replace(/[<>]/g, '').slice(0, 24) || 'Friend'

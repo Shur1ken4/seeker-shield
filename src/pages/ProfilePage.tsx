@@ -107,7 +107,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
                 ? `Active until ${new Date(pro.proUntil).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}.`
                 : pro?.freeMonthAvailable
                   ? 'Seeker Verified: your first month of Pro is free.'
-                  : `Instant alerts and 5 watched wallets for ${pro?.priceSkr ?? 250} SKR a month.`}
+                  : `Instant alerts and 5 friends for ${pro?.priceSkr ?? 150} SKR a month.`}
             </p>
           </div>
         </div>

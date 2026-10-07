@@ -89,4 +89,6 @@ export interface WardyState {
   sleepy: boolean
   daysToReward: number
   rewards: number
+  /** Paid the one-time adoption. Only present on GET /api/wardy. */
+  adopted?: boolean
 }

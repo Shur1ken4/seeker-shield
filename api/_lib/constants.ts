@@ -7,7 +7,9 @@ export const SGT_METADATA_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99T
 export const SGT_GROUP_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te'
 
 /** Wardy Pro: price in whole SKR and length in days (config values, CLAUDE.md). */
-export const PRO_PRICE_SKR = 250
+export const PRO_PRICE_SKR = 150 // about $2.60/month: ~1/4 of Webacy, ~1/3 of Revoke Premium
+/** One-time "Adopt Wardy" (about $0.88): unlocks the pet, patrols, streaks and alerts. Scans and fixes stay free. */
+export const ADOPT_PRICE_SKR = 50
 export const PRO_DAYS = 30
 export const FREE_WATCH_LIMIT = 2
 export const PRO_WATCH_LIMIT = 5

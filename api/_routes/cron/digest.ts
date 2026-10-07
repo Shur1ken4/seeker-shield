@@ -3,6 +3,7 @@ import { safeEqual } from '../../_lib/http.js'
 import { kv } from '../../_lib/kv.js'
 import { escapeHtml, sendTelegram } from '../../_lib/telegram.js'
 import type { Alert } from '../../_lib/watch.js'
+import { getWardy } from '../../_lib/wardy.js'
 
 /** Daily digest for free users (Vercel Cron sends Authorization: Bearer $CRON_SECRET). */
 export async function GET(req: Request) {
@@ -21,5 +22,20 @@ export async function GET(req: Request) {
     const html = `<b>Your daily Wardy digest</b>\n${lines.join('\n')}${more}\n\nWardy Pro sends these the moment they happen.`
     if (await sendTelegram(chatId, html, env.appUrl ? { text: 'Open Wardy', url: env.appUrl } : undefined)) sent++
   }
-  return Response.json({ ok: true, users: users.length, sent })
+
+  // Daily nudge: Wardy reminds people who haven't patrolled today. One message a day, never more.
+  let nudged = 0
+  const today = new Date().toISOString().slice(0, 10)
+  for (const user of await kv.smembers('tg:users')) {
+    const chatId = await kv.get<number>(`tg:chat:${user}`)
+    if (!chatId) continue
+    const w = await getWardy(user)
+    if (!w.adopted || w.patrolledToday) continue
+    if (!(await kv.set(`tg:nudge:${user}:${today}`, 1, { ex: 2 * 86400, nx: true }))) continue
+    const text = w.streak
+      ? `Wardy hasn’t patrolled today. Open Wardy to keep your ${w.streak}-day streak${w.daysToReward <= 2 ? ` (free Pro in ${w.daysToReward} day${w.daysToReward === 1 ? '' : 's'})` : ''}.`
+      : 'Wardy is napping. Wake him up for a quick patrol.'
+    if (await sendTelegram(chatId, text, env.appUrl ? { text: 'Open Wardy', url: env.appUrl } : undefined)) nudged++
+  }
+  return Response.json({ ok: true, users: users.length, sent, nudged })
 }

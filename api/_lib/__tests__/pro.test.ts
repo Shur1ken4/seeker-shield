@@ -33,28 +33,28 @@ let current: unknown
 describe('checkPayment', () => {
   it('accepts a confirmed 250 SKR transfer from the payer to the treasury', async () => {
     current = tx()
-    expect(await checkPayment('sig', PAYER, TREASURY)).toBeNull()
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).toBeNull()
   })
   it('rejects too little SKR', async () => {
     current = tx({ payerDelta: -249n * D, treasuryDelta: 249n * D })
-    expect(await checkPayment('sig', PAYER, TREASURY)).toMatch(/didn’t receive/)
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).toMatch(/didn’t receive/)
   })
   it('rejects another token', async () => {
     current = tx({ mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' })
-    expect(await checkPayment('sig', PAYER, TREASURY)).not.toBeNull()
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).not.toBeNull()
   })
   it('rejects a payment signed by someone else', async () => {
     current = tx({ signer: 'Someone1111111111111111111111111111111111' })
-    expect(await checkPayment('sig', PAYER, TREASURY)).toMatch(/signed/)
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).toMatch(/signed/)
   })
   it('rejects a failed transaction and a missing one', async () => {
     current = tx({ err: { InstructionError: [0, 'x'] } })
-    expect(await checkPayment('sig', PAYER, TREASURY)).toMatch(/failed/)
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).toMatch(/failed/)
     current = null
-    expect(await checkPayment('sig', PAYER, TREASURY)).toMatch(/not found/)
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).toMatch(/not found/)
   })
   it('rejects SKR that came from a different wallet', async () => {
     current = tx({ payerDelta: 0n })
-    expect(await checkPayment('sig', PAYER, TREASURY)).toMatch(/didn’t come from your wallet/)
+    expect(await checkPayment('sig', PAYER, TREASURY, 250)).toMatch(/didn’t come from your wallet/)
   })
 })

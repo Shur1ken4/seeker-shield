@@ -9,6 +9,8 @@ import { explainSimError } from './fixes'
 
 export interface ProInfo {
   priceSkr: number
+  adoptPriceSkr: number
+  adopted: boolean
   days: number
   mint: string
   decimals: number | null
@@ -17,17 +19,17 @@ export interface ProInfo {
   freeMonthAvailable: boolean
 }
 
-/** A plain SKR transfer to the treasury. No smart contract; the server verifies it on-chain afterwards. */
-export async function buildProPayment(connection: Connection, owner: PublicKey, info: ProInfo) {
+/** A plain SKR transfer to the treasury (Pro or adoption). The server verifies it on-chain afterwards. */
+export async function buildProPayment(connection: Connection, owner: PublicKey, info: ProInfo, priceSkr = info.priceSkr) {
   if (!info.treasury || info.decimals == null) throw new Error('Payments aren’t set up yet.')
   const mint = new PublicKey(info.mint)
   const treasury = new PublicKey(info.treasury)
   const from = getAssociatedTokenAddressSync(mint, owner, false, TOKEN_PROGRAM_ID)
   const to = getAssociatedTokenAddressSync(mint, treasury, true, TOKEN_PROGRAM_ID)
-  const amount = BigInt(info.priceSkr) * 10n ** BigInt(info.decimals)
+  const amount = BigInt(priceSkr) * 10n ** BigInt(info.decimals)
 
   const bal = await connection.getTokenAccountBalance(from).catch(() => null)
-  if (!bal || BigInt(bal.value.amount) < amount) throw new Error(`You need ${info.priceSkr} SKR in this wallet to unlock Pro.`)
+  if (!bal || BigInt(bal.value.amount) < amount) throw new Error(`You need ${priceSkr} SKR in this wallet.`)
 
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed')
   const msg = new TransactionMessage({

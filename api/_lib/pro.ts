@@ -1,4 +1,4 @@
-import { PRO_DAYS, PRO_PRICE_SKR, SKR_MINT } from './constants.js'
+import { PRO_DAYS, SKR_MINT } from './constants.js'
 import { kv } from './kv.js'
 import { rpc } from './solana.js'
 
@@ -30,10 +30,10 @@ interface TokenBalance {
 
 /**
  * Checks a payment transaction on-chain: confirmed, no error, signed by `payer`,
- * and moved at least PRO_PRICE_SKR of the SKR mint from `payer` to `treasury`.
+ * and moved at least `priceSkr` of the SKR mint from `payer` to `treasury`.
  * Returns null when valid, otherwise a plain-English reason.
  */
-export async function checkPayment(signature: string, payer: string, treasury: string): Promise<string | null> {
+export async function checkPayment(signature: string, payer: string, treasury: string, priceSkr: number): Promise<string | null> {
   const tx = await rpc<any>('getTransaction', [signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }])
   if (!tx) return 'Payment not found yet. Wait a few seconds and try again.'
   if (tx.meta?.err) return 'That payment failed on-chain.'
@@ -41,13 +41,21 @@ export async function checkPayment(signature: string, payer: string, treasury: s
   if (!keys.some((k) => k.pubkey === payer && k.signer)) return 'That payment wasn’t signed by your wallet.'
 
   const decimals = await skrDecimals()
-  const price = BigInt(PRO_PRICE_SKR) * 10n ** BigInt(decimals)
+  const price = BigInt(priceSkr) * 10n ** BigInt(decimals)
   const delta = (owner: string) => {
     const sum = (list: TokenBalance[] = []) =>
       list.filter((b) => b.mint === SKR_MINT && b.owner === owner).reduce((s, b) => s + BigInt(b.uiTokenAmount.amount), 0n)
     return sum(tx.meta.postTokenBalances) - sum(tx.meta.preTokenBalances)
   }
-  if (delta(treasury) < price) return `The treasury didn’t receive ${PRO_PRICE_SKR} SKR in that transaction.`
+  if (delta(treasury) < price) return `The treasury didn’t receive ${priceSkr} SKR in that transaction.`
   if (delta(payer) > -price) return 'That SKR didn’t come from your wallet.'
   return null
+}
+
+export async function isAdopted(address: string) {
+  return !!(await kv.get<number>(`adopted:${address}`))
+}
+
+export async function markAdopted(address: string) {
+  await kv.set(`adopted:${address}`, Date.now())
 }

@@ -35,7 +35,7 @@ export function useWardy(owner: string | null) {
     patrolledFor.current = owner
     try {
       const r = await api.post<PatrolResult>('/api/wardy/patrol')
-      setState(r.state)
+      setState((prev) => ({ ...r.state, adopted: prev?.adopted ?? true }))
       return r
     } catch {
       patrolledFor.current = null

@@ -10,8 +10,12 @@ import { api } from '@/lib/api'
 import { cn } from '@/lib/cn'
 import { short, timeAgo } from '@/lib/format'
 import type { Alert, Watched } from '../../api/_lib/types'
+import { ADOPT_PRICE_SKR } from '../../api/_lib/constants'
+import { AdoptSheet } from '@/components/AdoptSheet'
+import { Wardy } from '@/components/Wardy'
 
 interface WatchData {
+  adopted: boolean
   telegram: { linked: boolean }
   watched: (Watched & { score: number | null; word: string | null })[]
   alerts: Alert[]
@@ -41,6 +45,7 @@ function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
   const [error, setError] = useState<string | null>(null)
   const [linking, setLinking] = useState(false)
   const [testing, setTesting] = useState(false)
+  const [adoptOpen, setAdoptOpen] = useState(false)
   const toast = useToast()
 
   const load = useCallback(() => {
@@ -79,6 +84,24 @@ function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
     } finally {
       setTesting(false)
     }
+  }
+
+  if (data && !data.adopted) {
+    return (
+      <>
+        <div className="rounded-card border border-border bg-surface-1 p-6 text-center">
+          <div className="flex justify-center">
+            <Wardy mood="calm" size={72} />
+          </div>
+          <h3 className="mt-3 text-title font-semibold">Adopt Wardy to get alerts</h3>
+          <p className="mt-1 text-body-sm text-text-secondary">He’ll message you on Telegram when something lands in your wallet or a friend’s.</p>
+          <Button className="mt-4" onClick={() => setAdoptOpen(true)}>
+            Adopt for {ADOPT_PRICE_SKR} SKR
+          </Button>
+        </div>
+        <AdoptSheet open={adoptOpen} onClose={() => setAdoptOpen(false)} onAdopted={load} />
+      </>
+    )
   }
 
   if (error) return <EmptyState title="Couldn’t load your alerts" body={error} action={<Button variant="secondary" onClick={load}>Try again</Button>} />

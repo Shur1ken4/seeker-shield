@@ -46,7 +46,18 @@ Security apps get opened once and forgotten. Wardy is a small shield character w
 - **He eats the trash:** every fix (removed access, closed account, destroyed fake token) is a snack, verified on-chain and capped per day so self-sent spam earns nothing.
 - **He naps, never dies:** miss a day and he's asleep when you return, no guilt. The streak restarts; XP is never taken away.
 - **Streaks pay in Pro:** every 7-day streak adds 3 free days of Wardy Pro. No token payouts, so nothing to farm.
+- **He nudges you:** if you haven't patrolled by evening, Wardy sends one Telegram reminder to keep your streak.
 - **He grows:** Pup, Scout, Guard, Knight, Sentinel, Legend. Cosmetic only; levels never change what's checked or allowed.
+
+## How Wardy makes money (paid in SKR)
+
+| | Price | What you get |
+| --- | --- | --- |
+| Free | 0 | Scans, plain-English explanations, every fix including "Fix all" |
+| Adopt Wardy | 50 SKR once (about $0.90) | The pet, daily patrols, streaks, Telegram alerts, 2 friends' wallets |
+| Wardy Pro | 150 SKR a month (about $2.60) | Instant alerts, 5 friends' wallets, score history |
+
+For comparison: Revoke.cash charges $1.50 per batch revoke and $99 a year for Premium; Webacy Pro is $10 a month. Safety itself is never paywalled. Payments are plain SKR transfers to the treasury, verified on-chain by the server and redeemable once.
 
 ## How it uses the Solana Mobile Stack
 

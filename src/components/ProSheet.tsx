@@ -11,7 +11,7 @@ import { Spinner } from './Spinner'
 
 type Step = 'info' | 'review' | 'paying' | 'verifying' | 'done'
 
-const BENEFITS = ['Instant Telegram alerts (free is a daily digest)', 'Watch up to 5 friends’ wallets (free: 2)', 'Score history and priority explanations']
+const BENEFITS = ['Instant alerts, not a daily digest', 'Watch up to 5 friends’ wallets', 'Score history']
 
 export function ProSheet({ open, onClose, onChanged }: { open: boolean; onClose: () => void; onChanged: () => void }) {
   const { connection } = useConnection()
@@ -111,7 +111,7 @@ export function ProSheet({ open, onClose, onChanged }: { open: boolean; onClose:
               </li>
             ))}
           </ul>
-          <p className="text-caption text-text-muted">Scanning, explanations, fixes and your own alerts stay free forever.</p>
+          <p className="text-caption text-text-muted">Scans and fixes stay free.</p>
           {info.proUntil && <p className="text-body-sm text-safe">Pro is active until {fmt(info.proUntil)}. Paying adds {info.days} days.</p>}
           {!hasSession ? (
             <p className="text-body-sm text-text-secondary">Verify your wallet on the Watch or Profile tab first.</p>

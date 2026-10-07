@@ -5,26 +5,28 @@ import type { WardyState } from '../../api/_lib/types'
 /** Level, XP and streak under the score. The daily patrol is Wardy's meal. */
 export function WardyPatrol({
   state,
-  needsSession,
-  onStart,
+  needsAdoption,
+  adoptPrice,
+  onAdopt,
   starting,
   gained,
 }: {
   state: WardyState | null
-  needsSession: boolean
-  onStart: () => void
+  needsAdoption: boolean
+  adoptPrice: number
+  onAdopt: () => void
   starting: boolean
   gained: number | null
 }) {
-  if (needsSession) {
+  if (needsAdoption) {
     return (
       <div className="flex items-center gap-3 rounded-card border border-border bg-surface-1 p-4">
         <div className="flex-1">
-          <p className="text-body-sm font-medium">Start Wardy’s daily patrol</p>
-          <p className="text-caption text-text-secondary">Visit daily, earn free Pro days.</p>
+          <p className="text-body-sm font-medium">Adopt Wardy</p>
+          <p className="text-caption text-text-secondary">Daily patrols, streaks and free Pro days.</p>
         </div>
-        <Button size="sm" onClick={onStart} loading={starting}>
-          Start
+        <Button size="sm" onClick={onAdopt} loading={starting}>
+          {adoptPrice} SKR
         </Button>
       </div>
     )

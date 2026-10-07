@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     const linked = new Set((await kv.get<string[]>(`tg:wallets:${chatId}`)) ?? [])
     linked.add(address)
     await kv.set(`tg:wallets:${chatId}`, [...linked])
+    await kv.sadd('tg:users', address)
     await addWatcher(address, address) // your own wallet is always watched once Telegram is linked
     await syncHeliusWebhook().catch(() => {})
     await sendTelegram(chatId, `Linked. Wardy will alert you here about new risks in ${address.slice(0, 4)}…${address.slice(-4)}.\n\nSend /stop to turn alerts off.`)
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
     const linked = (await kv.get<string[]>(`tg:wallets:${chatId}`)) ?? []
     for (const a of linked) {
       await kv.del(`tg:chat:${a}`)
+      await kv.srem('tg:users', a)
       await removeWatcher(a, a)
     }
     await sendTelegram(chatId, 'Alerts are off. You can turn them on again from the app.')
