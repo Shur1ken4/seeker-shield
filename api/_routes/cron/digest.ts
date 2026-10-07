@@ -18,8 +18,8 @@ export async function GET(req: Request) {
     if (!chatId || !items.length) continue
     const lines = items.slice(0, 8).map((a) => `• <b>${escapeHtml(a.nickname)}</b>: ${escapeHtml(a.title)}`)
     const more = items.length > 8 ? `\n…and ${items.length - 8} more.` : ''
-    const html = `<b>Your daily Shield digest</b>\n${lines.join('\n')}${more}\n\nShield Pro sends these the moment they happen.`
-    if (await sendTelegram(chatId, html, env.appUrl ? { text: 'Open Seeker Shield', url: env.appUrl } : undefined)) sent++
+    const html = `<b>Your daily Wardy digest</b>\n${lines.join('\n')}${more}\n\nWardy Pro sends these the moment they happen.`
+    if (await sendTelegram(chatId, html, env.appUrl ? { text: 'Open Wardy', url: env.appUrl } : undefined)) sent++
   }
   return Response.json({ ok: true, users: users.length, sent })
 }

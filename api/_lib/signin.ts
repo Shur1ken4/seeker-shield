@@ -4,7 +4,7 @@ export function signInMessage({ domain, address, nonce, issuedAt }: { domain: st
     `${domain} wants you to sign in with your Solana account:`,
     address,
     '',
-    'Sign in to Seeker Shield to verify your Seeker. This is free, sends no transaction, and gives no permissions.',
+    'Sign in to Wardy to verify your Seeker. This is free, sends no transaction, and gives no permissions.',
     '',
     `URI: https://${domain}`,
     'Version: 1',

@@ -6,7 +6,7 @@ export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const SGT_METADATA_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te'
 export const SGT_GROUP_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te'
 
-/** Shield Pro: price in whole SKR and length in days (config values, CLAUDE.md). */
+/** Wardy Pro: price in whole SKR and length in days (config values, CLAUDE.md). */
 export const PRO_PRICE_SKR = 250
 export const PRO_DAYS = 30
 export const FREE_WATCH_LIMIT = 2

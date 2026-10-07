@@ -9,6 +9,9 @@ import { short, sol } from '@/lib/format'
 import type { ProInfo } from '@/lib/pro'
 import { useSession } from '@/lib/wallet'
 import { readLocalStats } from '@/lib/localStats'
+import { useWardy } from '@/lib/useWardy'
+import { Wardy } from '@/components/Wardy'
+import { Flame } from 'lucide-react'
 
 interface StatsData {
   stats: { reclaimedLamports: number; fixed: number }
@@ -23,6 +26,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
   const [pro, setPro] = useState<ProInfo | null>(null)
   const [skr, setSkr] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const wardy = useWardy(owner ?? null)
 
   const load = useCallback(() => {
     if (!owner) return
@@ -60,6 +64,23 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
         )}
       </header>
 
+      {wardy.state && (
+        <div className="flex items-center gap-4 rounded-card border border-border bg-surface-1 p-4">
+          <Wardy mood={wardy.state.sleepy ? 'sleepy' : 'happy'} size={72} />
+          <div className="min-w-0 flex-1">
+            <p className="font-brand text-title font-extrabold">Wardy</p>
+            <p className="text-body-sm text-text-secondary">
+              Level {wardy.state.level} · {wardy.state.levelName} · {wardy.state.xp} XP
+            </p>
+            <p className="mt-1 inline-flex items-center gap-1 text-caption text-text-muted">
+              <Flame size={14} className={wardy.state.streak ? 'text-warning' : ''} aria-hidden />
+              {wardy.state.streak}-day streak · best {wardy.state.bestStreak}
+              {wardy.state.rewards ? ` · ${wardy.state.rewards * 3} free Pro days earned` : ''}
+            </p>
+          </div>
+        </div>
+      )}
+
       <dl className="grid grid-cols-2 gap-3">
         <div className="rounded-card border border-border bg-surface-1 p-4">
           <dt className="text-caption text-text-muted">SOL reclaimed</dt>
@@ -80,7 +101,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
         <div className="flex items-start gap-3">
           <Sparkles size={20} className={pro?.proUntil ? 'text-safe' : 'text-text-muted'} aria-hidden />
           <div className="flex-1">
-            <p className="text-body font-medium">{pro?.proUntil ? 'Shield Pro' : 'Free plan'}</p>
+            <p className="text-body font-medium">{pro?.proUntil ? 'Wardy Pro' : 'Free plan'}</p>
             <p className="text-body-sm text-text-secondary">
               {pro?.proUntil
                 ? `Active until ${new Date(pro.proUntil).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}.`

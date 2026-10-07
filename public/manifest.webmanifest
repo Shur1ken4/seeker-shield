@@ -1,7 +1,7 @@
 {
-  "name": "Seeker Shield",
-  "short_name": "Shield",
-  "description": "A security guard for your Seeker wallet.",
+  "name": "Wardy",
+  "short_name": "Wardy",
+  "description": "Wallet security for Seeker.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

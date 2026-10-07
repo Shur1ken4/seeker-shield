@@ -28,10 +28,11 @@ export async function deliver(watcher: string, alert: Alert, { instant = false }
   if (instant || (await isPro(watcher))) {
     // At most one Telegram message per watched wallet per 10 minutes.
     if (!instant && !(await kv.set(`tg:rl:${watcher}:${alert.wallet}`, 1, { ex: 600, nx: true }))) return { telegram: false }
-    const label = alert.severity === 'critical' ? 'Critical' : alert.severity === 'warning' ? 'Warning' : 'Info'
-    const html = `<b>${label} · ${escapeHtml(alert.nickname)}</b>\n${escapeHtml(alert.title)}\n\n${escapeHtml(alert.text)}`
+    const label = alert.severity === 'critical' ? 'Fix now' : alert.severity === 'warning' ? 'Check this' : 'Heads-up'
+    const where = alert.nickname === 'Your wallet' ? 'your wallet' : escapeHtml(alert.nickname)
+    const html = `<b>Wardy found something in ${where}</b> · ${label}\n${escapeHtml(alert.title)}\n\n${escapeHtml(alert.text)}`
     const url = appLink(watcher, alert.wallet)
-    return { telegram: await sendTelegram(chatId, html, url ? { text: 'Open Seeker Shield', url } : undefined) }
+    return { telegram: await sendTelegram(chatId, html, url ? { text: 'Open Wardy', url } : undefined) }
   }
   await kv.lpush(`digest:${watcher}`, alert, 20)
   await kv.sadd('digest:users', watcher)

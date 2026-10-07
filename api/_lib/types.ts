@@ -75,3 +75,18 @@ export interface Alert {
   title: string
   text: string
 }
+
+export interface WardyState {
+  xp: number
+  level: number
+  levelName: string
+  levelXp: number
+  nextLevelXp: number | null
+  streak: number
+  bestStreak: number
+  patrolledToday: boolean
+  /** Missed at least one day since the last patrol. Wardy naps; he never dies. */
+  sleepy: boolean
+  daysToReward: number
+  rewards: number
+}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { RefreshCw, ShieldCheck, Wallet } from 'lucide-react'
 import { Button } from '@/components/Button'
@@ -7,12 +7,15 @@ import { EmptyState } from '@/components/EmptyState'
 import { FindingCard, type FindingAction } from '@/components/FindingCard'
 import { FixSheet } from '@/components/FixSheet'
 import { ScoreDial } from '@/components/ScoreDial'
-import { FindingCardSkeleton, Skeleton } from '@/components/Skeleton'
+import { FindingCardSkeleton } from '@/components/Skeleton'
 import { useToast } from '@/components/Toast'
 import { ConnectHero } from '@/components/ConnectHero'
 import { ScanReport } from '@/components/ScanReport'
 import { DemoPermission } from '@/components/DemoPermission'
-import { forgetWallet } from '@/lib/wallet'
+import { forgetWallet, useSession } from '@/lib/wallet'
+import { useWardy } from '@/lib/useWardy'
+import { WardyPatrol } from '@/components/WardyPatrol'
+import { Wardy, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
 import type { FixItem } from '@/lib/fixes'
 import { short, sol, timeAgo } from '@/lib/format'
@@ -28,13 +31,14 @@ const GROUPS: { severity: Severity; label: string; hint: string }[] = [
   { severity: 'cleanup', label: 'Tidy up', hint: 'Harmless, and gives SOL back' },
 ]
 
+/** What Wardy says about the wallet, in his own voice. */
 function summaryLine(findings: Finding[], readOnly: boolean) {
-  if (!findings.length) return 'Nothing can drain this wallet right now.'
+  if (!findings.length) return readOnly ? 'All quiet in this wallet. Nothing can drain it right now.' : 'All quiet. Nothing can drain your wallet right now.'
   const urgent = findings.filter((f) => f.severity !== 'cleanup').length
   const tidy = findings.length - urgent
   const accounts = `${tidy} old account${tidy === 1 ? '' : 's'} holding SOL`
-  if (!urgent) return readOnly ? `Safe, with ${accounts} the owner can get back.` : `Safe, with ${accounts} you can get back.`
-  return `${urgent} thing${urgent === 1 ? ' needs' : 's need'} ${readOnly ? 'attention' : 'your attention'}${tidy ? `, plus ${tidy} to tidy up` : ''}.`
+  if (!urgent) return readOnly ? `This wallet is safe. I found ${accounts} its owner can get back.` : `You’re safe. I found ${accounts} you can get back.`
+  return `I found ${urgent} thing${urgent === 1 ? '' : 's'} that need${urgent === 1 ? 's' : ''} ${readOnly ? 'attention' : 'your attention'}${tidy ? `, plus ${tidy} to tidy up` : ''}.`
 }
 
 export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoToWatch?: () => void }) {
@@ -52,6 +56,23 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   const [fixItems, setFixItems] = useState<FixItem[] | null>(null)
   const [burnTarget, setBurnTarget] = useState<Finding | null>(null)
   const toast = useToast()
+  const { hasSession, signIn, signingIn } = useSession()
+  const wardy = useWardy(readOnly ? null : owner)
+  const [eating, setEating] = useState(false)
+  const [gained, setGained] = useState<number | null>(null)
+
+  // Wardy's daily patrol: once the user's own wallet has been scanned, count today's meal.
+  useEffect(() => {
+    if (readOnly || !data || !hasSession) return
+    wardy.patrol().then((r) => {
+      if (!r || r.already) return
+      setGained(r.gained)
+      toast('success', r.napped ? 'Wardy woke up from his nap and finished his patrol.' : 'Patrol complete. Wardy’s fed for today.')
+      if (r.levelUp) toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)
+      if (r.rewardProDays) toast('success', `${r.state.streak}-day streak. You earned ${r.rewardProDays} free days of Wardy Pro.`)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readOnly, data?.scannedAt, hasSession])
 
   const visible = useMemo(() => data?.findings.filter((f) => !hidden.has(f.mint)) ?? [], [data, hidden])
   const hiddenCount = (data?.findings.length ?? 0) - visible.length
@@ -97,17 +118,32 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
       </div>
 
       {loading && !data ? (
-        <div className="flex items-center gap-6" aria-label="Scanning">
-          <Skeleton className="h-[168px] w-[168px] rounded-full" />
+        <div className="flex items-center gap-5" aria-label="Scanning">
+          <div className="flex h-[156px] w-[156px] shrink-0 items-center justify-center rounded-full border-[6px] border-surface-2">
+            <Wardy mood="calm" size={78} />
+          </div>
           <div className="space-y-2">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-7 w-28" />
+            <p className="text-body font-medium">Wardy is patrolling…</p>
+            <p className="text-body-sm text-text-secondary">Checking every token, app access and old account.</p>
           </div>
         </div>
       ) : data ? (
         <div className="space-y-3">
-          <ScoreDial score={score} />
-          <p className="text-body text-text-primary">{summaryLine(visible, readOnly)}</p>
+          <ScoreDial score={score} mood={wardyMood(eating, !readOnly && !!wardy.state?.sleepy && !wardy.state.patrolledToday)} />
+          {/* Wardy's speech bubble */}
+          <div className="relative rounded-card bg-surface-2 px-4 py-3">
+            <span aria-hidden className="absolute -top-1.5 left-14 h-3 w-3 rotate-45 bg-surface-2" />
+            <p className="relative text-body text-text-primary">{summaryLine(visible, readOnly)}</p>
+          </div>
+          {!readOnly && (
+            <WardyPatrol
+              state={wardy.state}
+              needsSession={!hasSession}
+              starting={signingIn}
+              gained={gained}
+              onStart={() => signIn().catch((e) => toast('error', (e as Error).message))}
+            />
+          )}
         </div>
       ) : null}
 
@@ -143,7 +179,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
         <EmptyState
           icon={<ShieldCheck size={28} aria-hidden />}
           title="You’re all clear"
-          body={readOnly ? 'Nothing in this wallet needs fixing right now.' : 'Nothing needs fixing. Turn on alerts and Shield will tell you if that changes.'}
+          body={readOnly ? 'Nothing in this wallet needs fixing right now.' : 'Nothing needs fixing. Turn on alerts and Wardy will tell you if that changes.'}
           action={
             !readOnly && onGoToWatch ? (
               <Button onClick={onGoToWatch}>Turn on alerts</Button>
@@ -215,6 +251,10 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           toast('success', r.reclaimedLamports > 0 ? `Done. ${sol(r.reclaimedLamports)} is back in your wallet.` : 'Done. Your wallet is safer.')
           // Update the score now; markFixed also re-checks the chain a few times in the background.
           markFixed(r.fixedIds)
+          // Wardy eats what was fixed; the server adds snack XP once it has verified the fix on-chain.
+          setEating(true)
+          window.setTimeout(() => setEating(false), 2600)
+          r.recorded.then(() => wardy.refresh())
           if (owner) addLocalStats(owner, { fixed: r.fixedIds.length, reclaimedLamports: r.reclaimedLamports })
           onFixed?.()
           r.recorded.then(() => onFixed?.())
@@ -222,4 +262,10 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
       />
     </section>
   )
+}
+
+function wardyMood(eating: boolean, sleepy: boolean): WardyMood | undefined {
+  if (eating) return 'eating'
+  if (sleepy) return 'sleepy'
+  return undefined
 }

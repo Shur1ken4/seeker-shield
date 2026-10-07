@@ -86,7 +86,7 @@ async function main() {
     [burner],
   )
   console.log(`\nSent 1 ${SYMBOL} (mint ${mint.publicKey.toBase58()}) to ${target}.`)
-  console.log('Open Seeker Shield and tap "Scan again": it should show up as Suspicious.')
+  console.log('Open Wardy and tap "Scan again": it should show up as Suspicious.')
 }
 
 main().catch((e) => {

@@ -3,6 +3,7 @@
 @import '@fontsource/ibm-plex-sans/600.css';
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/manrope/800.css';
 
 @tailwind base;
 @tailwind components;
@@ -74,4 +75,49 @@ body {
 }
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Wardy: gentle, purposeful motion. Disabled by the reduced-motion rule above. */
+.wardy .wardy-body,
+.wardy .wardy-eyes,
+.wardy .wardy-mouth,
+.wardy .wardy-z {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.wardy-happy .wardy-body { animation: wardy-bob 2.4s ease-in-out infinite; }
+.wardy-calm .wardy-eyes,
+.wardy-worried .wardy-eyes { animation: wardy-blink 4.5s infinite; }
+.wardy-alarmed .wardy-body { animation: wardy-shake 0.5s ease-in-out 3; }
+.wardy-eating .wardy-mouth { animation: wardy-chomp 0.35s ease-in-out infinite; }
+.wardy-eating .wardy-body { animation: wardy-bob 0.7s ease-in-out infinite; }
+.wardy-sleepy .wardy-z { animation: wardy-z 2.6s ease-in-out infinite; }
+
+@keyframes wardy-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes wardy-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes wardy-shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+@keyframes wardy-chomp {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.2); }
+}
+@keyframes wardy-z {
+  0% { opacity: 0; transform: translate(0, 6px); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translate(6px, -10px); }
+}
+@keyframes xp-pop {
+  0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  20% { opacity: 1; transform: translateY(0) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-8px); }
 }

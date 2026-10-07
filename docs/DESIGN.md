@@ -1,4 +1,4 @@
-# Seeker Shield design system
+# Wardy design system
 
 ## Principles
 1. Calm, not scary. Security apps that shout cause panic. Use plain words and one clear next step.
@@ -20,7 +20,7 @@ Colours (dark / light):
 - warning: #F5B841 / #A86F00
 - cleanup: #8FA3B8 / #56687A
 - Each semantic colour also has a tinted background at 14% opacity for chips and banners.
-Typography: IBM Plex Sans (UI) and IBM Plex Mono (addresses, amounts), self-hosted via @fontsource so the APK works offline. Scale: 12 caption, 14 body-small, 16 body, 20 title, 28 heading, 64 score number. Weights 400, 500, 600 only. Line height 1.5 for body.
+Typography: Manrope ExtraBold for the wordmark only; IBM Plex Sans (UI) and IBM Plex Mono (addresses, amounts), self-hosted via @fontsource so the APK works offline. Scale: 12 caption, 14 body-small, 16 body, 20 title, 28 heading, 64 score number. Weights 400, 500, 600 only. Line height 1.5 for body.
 Spacing: 4px base. Steps 4, 8, 12, 16, 24, 32, 48.
 Radius: 6 chips, 10 cards and buttons, 16 bottom sheets. Not everything rounded the same.
 Elevation: none on cards (use border); one soft shadow only for bottom sheets.
@@ -45,3 +45,9 @@ Sentence case. Short. No jargon on the main screens (say "permission" instead of
 
 ## Accessibility
 Contrast at least 4.5:1 for text. Tap targets 48px. Every icon button has an aria-label. Never use colour alone: chips always carry a word.
+
+## Wardy (mascot)
+- Same silhouette as the logo: shield with a raised centre, two vertical oval eyes.
+- Moods follow the safety score: happy (90+), calm (70-89, blinks), worried (40-69, brows), alarmed (under 40, amber body, wide eyes); plus sleepy (missed days) and eating (after a fix).
+- Wardy speaks in first person in his speech bubble and alerts; the rest of the UI does not.
+- Motion is small and purposeful and is turned off with prefers-reduced-motion.

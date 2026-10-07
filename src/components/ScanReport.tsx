@@ -63,7 +63,7 @@ export function ScanReport({ data, findings, defaultOpen = true }: { data: ScanR
     <div className="rounded-card border border-border bg-surface-1">
       <button onClick={() => setExpanded((e) => !e)} aria-expanded={expanded} className="flex w-full items-start gap-3 px-4 pb-2 pt-4 text-left">
         <div className="flex-1">
-          <h2 className="text-body font-medium">What Shield checked</h2>
+          <h2 className="text-body font-medium">What Wardy checked</h2>
           <p className="mt-1 text-body-sm text-text-secondary">
             {plural(n, 'token account')} and your SOL balance, read live from Solana
             {data.durationMs ? ` in ${(data.durationMs / 1000).toFixed(1)} s` : ''}.

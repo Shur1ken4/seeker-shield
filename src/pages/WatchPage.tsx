@@ -27,7 +27,7 @@ export function WatchPage({ onGoToScan, onUpgrade }: { onGoToScan: () => void; o
     <section className="space-y-6 pt-2">
       <header>
         <h1 className="text-heading font-semibold">Watch</h1>
-        <p className="mt-1 text-body-sm text-text-secondary">Shield keeps checking after you leave. If a fake token or new app access shows up in your wallet or a friend’s, you get a Telegram message.</p>
+        <p className="mt-1 text-body-sm text-text-secondary">Wardy keeps checking after you leave. If a fake token or new app access shows up in your wallet or a friend’s, you get a Telegram message.</p>
       </header>
       <VerifyGate why="So alerts go to you and nobody else." onGoToScan={onGoToScan}>
         <WatchContent onUpgrade={onUpgrade} />
@@ -211,7 +211,7 @@ function WatchedList({ data, onChange, onUpgrade }: { data: WatchData; onChange:
           </p>
           {!data.pro && (
             <Button className="mt-3" variant="secondary" onClick={onUpgrade}>
-              See Shield Pro
+              See Wardy Pro
             </Button>
           )}
         </div>
@@ -245,7 +245,7 @@ function WatchedList({ data, onChange, onUpgrade }: { data: WatchData; onChange:
           <Button type="submit" className="w-full" disabled={!target.trim()} loading={adding}>
             Add wallet
           </Button>
-          <p className="text-caption text-text-muted">Read-only. Shield can see risks in their wallet but can never change it.</p>
+          <p className="text-caption text-text-muted">Read-only. Wardy can see risks in their wallet but can never change it.</p>
         </form>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Fingerprint, MessageSquareText, ScanSearch, ShieldCheck } from 'lucide-react'
+import { Fingerprint, MessageSquareText, ScanSearch } from 'lucide-react'
+import { Wardy } from './Wardy'
 import { useConnectWallet } from '@/lib/wallet'
 import { Button } from './Button'
 import { Sheet } from './Sheet'
@@ -19,18 +20,18 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
   return (
     <section className="space-y-8 pt-8">
       <div className="space-y-3">
-        <ShieldCheck size={40} strokeWidth={1.5} className="text-safe" aria-hidden />
+        <Wardy mood="happy" size={64} />
         <h1 className="text-heading font-semibold">Your keys are safe. Is your wallet?</h1>
         <p className="text-body text-text-secondary">
-          Shield checks your wallet for the 3 things drainers use, explains each one in plain English, and fixes it with your fingerprint.
+          Meet Wardy. He patrols your wallet for the 3 things drainers use, explains each one in plain English, and fixes it with your fingerprint.
         </p>
       </div>
 
       <ol className="space-y-3">
         {[
-          { icon: ScanSearch, title: 'Scan', text: 'See what can touch your tokens.' },
+          { icon: ScanSearch, title: 'Patrol', text: 'Wardy checks what can touch your tokens.' },
           { icon: MessageSquareText, title: 'Understand', text: 'One plain sentence per problem.' },
-          { icon: Fingerprint, title: 'Fix', text: 'One tap, one fingerprint.' },
+          { icon: Fingerprint, title: 'Fix', text: 'One tap, one fingerprint. Wardy eats the trash.' },
         ].map(({ icon: Icon, title, text }, i) => (
           <li key={title} className="flex items-center gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-safe/[.14] text-safe">
@@ -51,7 +52,7 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
           Scan my wallet
         </Button>
         {error && <p className="text-body-sm text-critical">{error}</p>}
-        <p className="text-caption text-text-muted">Free and read-only. Shield can’t move your funds, and never asks for your seed phrase.</p>
+        <p className="text-caption text-text-muted">Free and read-only. Wardy can’t move your funds, and never asks for your seed phrase.</p>
       </div>
 
       <div>
@@ -107,7 +108,7 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
           </ul>
         ) : (
           <p className="text-body-sm text-text-secondary">
-            No wallet app found on this device. Open Seeker Shield on your Seeker or another Android phone, in the app or in Chrome, to connect your wallet.
+            No wallet app found on this device. Open Wardy on your Seeker or another Android phone, in the app or in Chrome, to connect your wallet.
           </p>
         )}
       </Sheet>

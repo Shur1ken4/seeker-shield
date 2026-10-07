@@ -1,6 +1,6 @@
 import type { Finding, ScoreWord } from './types.js'
 
-/** Shield Score, exactly as CLAUDE.md defines it. */
+/** Safety score, exactly as CLAUDE.md defines it. */
 export function computeScore(findings: Pick<Finding, 'severity'>[]): number {
   const count = (s: Finding['severity']) => findings.filter((f) => f.severity === s).length
   const penalty =

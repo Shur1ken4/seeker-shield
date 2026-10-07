@@ -24,6 +24,7 @@ export default {
     fontFamily: {
       sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
       mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+      brand: ['Manrope', '"IBM Plex Sans"', 'sans-serif'],
     },
     fontSize: {
       caption: ['12px', '1.4'],
@@ -33,7 +34,7 @@ export default {
       heading: ['28px', '1.2'],
       score: ['64px', '1'],
     },
-    fontWeight: { normal: '400', medium: '500', semibold: '600' },
+    fontWeight: { normal: '400', medium: '500', semibold: '600', extrabold: '800' },
     borderRadius: { none: '0', chip: '6px', card: '10px', sheet: '16px', full: '9999px' },
     extend: {
       minHeight: { tap: '48px' },

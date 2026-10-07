@@ -91,7 +91,7 @@ export function ProSheet({ open, onClose, onChanged }: { open: boolean; onClose:
   const fmt = (ms: number) => new Date(ms).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
-    <Sheet open={open} onClose={() => step !== 'paying' && step !== 'verifying' && onClose()} title={step === 'done' ? 'Shield Pro is on' : 'Shield Pro'}>
+    <Sheet open={open} onClose={() => step !== 'paying' && step !== 'verifying' && onClose()} title={step === 'done' ? 'Wardy Pro is on' : 'Wardy Pro'}>
       {!info && !error && (
         <div className="flex items-center gap-3 py-6 text-body-sm text-text-secondary">
           <Spinner /> Loading…
@@ -134,7 +134,7 @@ export function ProSheet({ open, onClose, onChanged }: { open: boolean; onClose:
       {info && step === 'review' && (
         <div className="space-y-4">
           <p className="text-body">
-            This sends <span className="font-semibold">{info.priceSkr} SKR</span> from your wallet to the Seeker Shield treasury and turns on Pro for {info.days} days.
+            This sends <span className="font-semibold">{info.priceSkr} SKR</span> from your wallet to the Wardy treasury and turns on Pro for {info.days} days.
           </p>
           <p className="break-all font-mono text-caption text-text-muted">Treasury {info.treasury}</p>
           <p className="text-caption text-text-muted">Test-run on the network first: it passed. Network fee under 0.0001 SOL. No other tokens are touched.</p>

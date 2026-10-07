@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { scoreWord } from '../../api/_lib/score'
+import { Wardy, moodForScore, type WardyMood } from './Wardy'
 
 function band(score: number) {
   if (score >= 90) return 'text-safe'
@@ -38,13 +39,14 @@ function useCountUp(target: number, ms = 600) {
   return value
 }
 
-export function ScoreDial({ score, size = 168 }: { score: number; size?: number }) {
+/** The score ring with Wardy living inside it. His mood mirrors the score unless overridden (eating, sleepy). */
+export function ScoreDial({ score, size = 156, mood }: { score: number; size?: number; mood?: WardyMood }) {
   const shown = useCountUp(score)
   const stroke = 6
   const r = (size - stroke) / 2
   const circ = 2 * Math.PI * r
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-5">
       <div className="relative shrink-0" style={{ width: size, height: size }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden>
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-surface-2" />
@@ -57,18 +59,20 @@ export function ScoreDial({ score, size = 168 }: { score: number; size?: number 
             strokeLinecap="round"
             strokeDasharray={circ}
             strokeDashoffset={circ * (1 - shown / 100)}
-            className={cn('stroke-current', band(shown))}
+            className={cn('stroke-current transition-colors duration-base', band(shown))}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-score font-semibold tabular-nums" aria-label={`Shield Score ${score} out of 100`}>
-            {shown}
-          </span>
+          <Wardy mood={mood ?? moodForScore(score)} size={size * 0.5} />
         </div>
       </div>
       <div>
-        <p className="text-caption uppercase tracking-wide text-text-muted">Shield Score</p>
-        <p className={cn('text-heading font-semibold', band(score))}>{scoreWord(score)}</p>
+        <p className="text-caption uppercase tracking-wide text-text-muted">Safety score</p>
+        <p className="text-heading font-semibold tabular-nums" aria-label={`Safety score ${score} out of 100`}>
+          <span className="text-[44px] leading-none">{shown}</span>
+          <span className="text-body text-text-muted">/100</span>
+        </p>
+        <p className={cn('text-title font-semibold', band(score))}>{scoreWord(score)}</p>
       </div>
     </div>
   )

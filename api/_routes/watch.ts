@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   if (list.some((w) => w.address === address)) return fail('You’re already watching that wallet.')
   const limit = await watchLimit(s.address)
   if (list.length >= limit) {
-    return fail(limit < 5 ? `Free plan watches up to ${limit} wallets. Shield Pro raises it to 5.` : `You’re watching the maximum of ${limit} wallets.`, 403)
+    return fail(limit < 5 ? `Free plan watches up to ${limit} wallets. Wardy Pro raises it to 5.` : `You’re watching the maximum of ${limit} wallets.`, 403)
   }
   list.push({ address, nickname, addedAt: Date.now() })
   await setWatched(s.address, list)

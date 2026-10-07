@@ -19,6 +19,8 @@ import * as r_stats from './_routes/stats.js'
 import * as r_telegram_link from './_routes/telegram/link.js'
 import * as r_telegram_test from './_routes/telegram/test.js'
 import * as r_telegram_webhook from './_routes/telegram/webhook.js'
+import * as r_wardy from './_routes/wardy.js'
+import * as r_wardy_patrol from './_routes/wardy/patrol.js'
 import * as r_watch from './_routes/watch.js'
 
 type Handler = (req: Request) => Response | Promise<Response>
@@ -41,6 +43,8 @@ const routes: Record<string, Partial<Record<string, Handler>>> = {
   'telegram/link': r_telegram_link,
   'telegram/test': r_telegram_test,
   'telegram/webhook': r_telegram_webhook,
+  'wardy': r_wardy,
+  'wardy/patrol': r_wardy_patrol,
   'watch': r_watch,
 }
 

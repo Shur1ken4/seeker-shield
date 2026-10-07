@@ -68,7 +68,7 @@ export function DemoPermission({ onDone }: { onDone: () => void }) {
           <p className="text-body">
             Demo only. This lets your own test wallet <span className="font-mono">{short(DELEGATE!)}</span> move the smallest possible unit of one token you hold.
           </p>
-          <p className="text-body-sm text-text-secondary">Shield will then find it, and you can revoke it with one tap.</p>
+          <p className="text-body-sm text-text-secondary">Wardy will then find it, and you can revoke it with one tap.</p>
           {msg && <p className="text-body-sm text-critical">{msg}</p>}
           <Button className="w-full" onClick={run} loading={busy}>
             Approve test permission

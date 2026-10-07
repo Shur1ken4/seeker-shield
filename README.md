@@ -1,6 +1,6 @@
-# Seeker Shield
+# Wardy
 
-**A security guard for your Seeker wallet.** Seeker Shield finds the risky permissions and scam airdrops that drainers use, explains each one in plain English, and fixes it with one fingerprint tap. Then it keeps watching your wallet and your friends' wallets, and alerts you on Telegram.
+**Wallet security for Seeker, with a guard that lives in your phone.** Wardy finds the risky permissions and scam airdrops that drainers use, explains each one in plain English, and fixes it with one fingerprint tap. Then it keeps watching your wallet and your friends' wallets, and alerts you on Telegram.
 
 Built for CLOCK IN, the Solana Mobile hackathon.
 
@@ -22,9 +22,9 @@ Seeker owners are some of the most active wallets on Solana, so they attract all
 
 | Screen | What you get |
 | --- | --- |
-| **Scan** | Connect the Seed Vault Wallet and get a Shield Score from 0 to 100. Findings are grouped as Critical, Warning and Cleanup, each with a one-sentence AI explanation and a fix button. "Fix all safe items" revokes and closes everything safe in as few fingerprint approvals as possible. |
+| **Scan** | Connect the Seed Vault Wallet and get a Safety score from 0 to 100. Findings are grouped as Critical, Warning and Cleanup, each with a one-sentence AI explanation and a fix button. "Fix all safe items" revokes and closes everything safe in as few fingerprint approvals as possible. |
 | **Watch** | Link Telegram once. Get an alert when something new and risky lands in your wallet, or in a friend's wallet you've added by address or `.skr` name. Alerts are also saved in the app. |
-| **Profile** | Seeker Verified badge (from your Genesis Token), SOL reclaimed, issues fixed, score history, and Shield Pro. |
+| **Profile** | Seeker Verified badge (from your Genesis Token), SOL reclaimed, issues fixed, score history, and Wardy Pro. |
 
 _Screenshots: add to `/docs` and link here._
 
@@ -37,12 +37,23 @@ _Screenshots: add to `/docs` and link here._
 | Empty token account | Cleanup | Close and get the rent SOL back |
 | Delegate, mint or creator on the scam list | Critical | Revoke, hide or burn |
 
+## Meet Wardy
+
+Security apps get opened once and forgotten. Wardy is a small shield character who lives in the app, so there's a reason to come back:
+
+- **His mood is your wallet's health:** happy when you're safe, worried when something needs a look, alarmed when it's critical. Status at a glance, not decoration.
+- **Daily patrol = his meal:** opening the app runs the scan; the first patrol each day feeds him, grows his XP and keeps your streak.
+- **He eats the trash:** every fix (removed access, closed account, destroyed fake token) is a snack, verified on-chain and capped per day so self-sent spam earns nothing.
+- **He naps, never dies:** miss a day and he's asleep when you return, no guilt. The streak restarts; XP is never taken away.
+- **Streaks pay in Pro:** every 7-day streak adds 3 free days of Wardy Pro. No token payouts, so nothing to farm.
+- **He grows:** Pup, Scout, Guard, Knight, Sentinel, Legend. Cosmetic only; levels never change what's checked or allowed.
+
 ## How it uses the Solana Mobile Stack
 
 - **Mobile Wallet Adapter**, through `@solana-mobile/wallet-standard-mobile` registered as a Wallet Standard wallet, so the Seed Vault Wallet connects natively.
 - **Seed Vault signing**: every fix and payment is one fingerprint approval, and multi-transaction fixes are signed as one batch.
 - **Seeker Genesis Token verification**: Sign In With Solana, then the official on-chain check (skip empty accounts; check metadata pointer and group membership; record the SGT mint).
-- **SKR payments**: Shield Pro costs 250 SKR for 30 days, sent as a plain transfer and verified on-chain by the server. Seeker Verified users get their first month free, once per Genesis Token.
+- **SKR payments**: Wardy Pro costs 250 SKR for 30 days, sent as a plain transfer and verified on-chain by the server. Seeker Verified users get their first month free, once per Genesis Token.
 - **`.skr` names**: add a friend by `alice.skr`; your own name shows on Profile.
 - **`webshell` packaging**: the Android app is built with `npx solana-mobile webshell`, not a Trusted Web Activity, so wallet intents work inside the app.
 

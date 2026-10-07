@@ -18,7 +18,7 @@ export function VerifyGate({ children, why, onGoToScan }: { children: ReactNode;
       <EmptyState
         icon={<BadgeCheck size={28} aria-hidden />}
         title="Prove it’s your wallet"
-        body={`${why} Sign a free message in Seed Vault. It’s not a transaction, costs nothing, and gives Shield no access.`}
+        body={`${why} Sign a free message in Seed Vault. It’s not a transaction, costs nothing, and gives Wardy no access.`}
         action={
           <div className="space-y-2">
             <Button

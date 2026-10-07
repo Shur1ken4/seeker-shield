@@ -6,7 +6,7 @@ export interface Session {
   createdAt: number
 }
 
-const TTL = 24 * 60 * 60
+const TTL = 30 * 24 * 60 * 60
 
 export function newToken() {
   const b = new Uint8Array(32)

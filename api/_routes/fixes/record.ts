@@ -2,6 +2,7 @@ import { fail, isWalletAddress, json, rateLimit, readJson } from '../../_lib/htt
 import { kv } from '../../_lib/kv.js'
 import { rpc } from '../../_lib/solana.js'
 import { addStats, getStats } from '../../_lib/stats.js'
+import { feedSnacks } from '../../_lib/wardy.js'
 import { TOKEN_2022_PROGRAM, TOKEN_PROGRAM } from '../../_lib/constants.js'
 
 /**
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
   }
   await kv.sadd('fix:sigs', body.signature)
   await addStats(owner, { reclaimedLamports: reclaimed, fixed })
+  const snackXp = await feedSnacks(owner, fixed)
   await kv.del(`scan:${owner}`)
-  return json({ stats: await getStats(owner), counted: { fixed, reclaimedLamports: reclaimed } })
+  return json({ stats: await getStats(owner), counted: { fixed, reclaimedLamports: reclaimed }, snackXp })
 }
