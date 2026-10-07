@@ -52,3 +52,4 @@ Contrast at least 4.5:1 for text. Tap targets 48px. Every icon button has an ari
 - Wardy speaks in first person in his speech bubble and alerts; the rest of the UI does not.
 - Motion is small and purposeful and is turned off with prefers-reduced-motion.
 - Wardy is the one place that isn't flat: a toy-like 3D look (shaded body, side wall for thickness, rim light, glossy reflection, eye glints) and a gentle 3D tilt toward the user's finger. Everything else in the UI stays flat.
+- Restraint with Wardy: show one system at a time (mood, today's meal, level, next evolution as a single line). No galleries of moods or evolutions in the app; new looks are a surprise on level-up. The `?playground` page (local dev only) is the place to see everything at once, for design checks and deck screenshots.
