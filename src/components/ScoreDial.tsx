@@ -77,3 +77,24 @@ export function ScoreDial({ score, size = 156, mood }: { score: number; size?: n
     </div>
   )
 }
+
+/** Compact score for under Wardy's stage: number, word and a thin bar in the band colour. */
+export function ScoreBar({ score }: { score: number }) {
+  const shown = useCountUp(score)
+  const fill = score >= 90 ? 'bg-safe' : score >= 70 ? 'bg-cleanup' : score >= 40 ? 'bg-warning' : 'bg-critical'
+  return (
+    <div aria-label={`Safety score ${score} out of 100, ${scoreWord(score)}`}>
+      <div className="flex items-baseline justify-between">
+        <span className="text-caption uppercase tracking-wide text-text-muted">Safety score</span>
+        <span className="text-body-sm">
+          <span className="text-title font-semibold tabular-nums">{shown}</span>
+          <span className="text-text-muted">/100 · </span>
+          <span className={cn('font-semibold', band(score))}>{scoreWord(score)}</span>
+        </span>
+      </div>
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2">
+        <div className={cn('h-full rounded-full transition-all duration-base', fill)} style={{ width: `${shown}%` }} />
+      </div>
+    </div>
+  )
+}

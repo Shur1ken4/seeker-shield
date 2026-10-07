@@ -6,7 +6,7 @@ import { BurnSheet } from '@/components/BurnSheet'
 import { EmptyState } from '@/components/EmptyState'
 import { FindingCard, type FindingAction } from '@/components/FindingCard'
 import { FixSheet } from '@/components/FixSheet'
-import { ScoreDial } from '@/components/ScoreDial'
+import { ScoreBar, ScoreDial } from '@/components/ScoreDial'
 import { FindingCardSkeleton } from '@/components/Skeleton'
 import { useToast } from '@/components/Toast'
 import { ConnectHero } from '@/components/ConnectHero'
@@ -14,9 +14,10 @@ import { ScanReport } from '@/components/ScanReport'
 import { DemoPermission } from '@/components/DemoPermission'
 import { forgetWallet, useSession } from '@/lib/wallet'
 import { useWardy } from '@/lib/useWardy'
-import { WardyPatrol } from '@/components/WardyPatrol'
+import { WardyStage } from '@/components/WardyStage'
+import { PENDING_ADOPT } from '@/components/ConnectHero'
 import { AdoptSheet } from '@/components/AdoptSheet'
-import { Wardy, type WardyMood } from '@/components/Wardy'
+import { Wardy, moodForScore, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
 import type { FixItem } from '@/lib/fixes'
 import { short, sol, timeAgo } from '@/lib/format'
@@ -65,18 +66,50 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   const [adoptOpen, setAdoptOpen] = useState(false)
   const adopted = !!wardy.state?.adopted
 
-  // Wardy's daily patrol: once the user's own wallet has been scanned, count today's meal.
-  useEffect(() => {
-    if (readOnly || !data || !hasSession || !adopted) return
-    wardy.patrol().then((r) => {
+  // Feeding Wardy = today's patrol: a fresh scan, then the server counts the meal once per day.
+  const [feeding, setFeeding] = useState(false)
+  const feed = async () => {
+    setFeeding(true)
+    try {
+      await rescan()
+      const r = await wardy.patrol()
       if (!r || r.already) return
+      setEating(true)
+      window.setTimeout(() => setEating(false), 2200)
       setGained(r.gained)
-      toast('success', r.napped ? 'Wardy woke up from his nap and finished his patrol.' : 'Patrol complete. Wardy’s fed for today.')
+      toast('success', r.napped ? 'Wardy woke up and ate. Patrol done.' : 'Patrol done. Wardy’s fed.')
       if (r.levelUp) toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)
-      if (r.rewardProDays) toast('success', `${r.state.streak}-day streak. You earned ${r.rewardProDays} free days of Wardy Pro.`)
-    })
+      if (r.rewardProDays) toast('success', `${r.state.streak}-day streak. ${r.rewardProDays} free Pro days.`)
+    } finally {
+      setFeeding(false)
+    }
+  }
+
+  // Came from "Unlock Wardy" on the first screen: open the adopt flow once the wallet is connected.
+  useEffect(() => {
+    if (readOnly || !wardy.state || adopted) return
+    let pending = false
+    try {
+      pending = sessionStorage.getItem(PENDING_ADOPT) === '1'
+      sessionStorage.removeItem(PENDING_ADOPT)
+    } catch {
+      pending = false
+    }
+    if (pending) startAdopt()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readOnly, data?.scannedAt, hasSession, adopted])
+  }, [readOnly, wardy.state, adopted])
+
+  const startAdopt = async () => {
+    // The payment is credited to the wallet that proved ownership, so sign in first.
+    if (!hasSession) {
+      try {
+        await signIn()
+      } catch (e) {
+        return toast('error', (e as Error).message)
+      }
+    }
+    setAdoptOpen(true)
+  }
 
   const visible = useMemo(() => data?.findings.filter((f) => !hidden.has(f.mint)) ?? [], [data, hidden])
   const hiddenCount = (data?.findings.length ?? 0) - visible.length
@@ -132,34 +165,32 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
           </div>
         </div>
       ) : data ? (
-        <div className="space-y-3">
-          <ScoreDial score={score} mood={wardyMood(eating, !readOnly && !!wardy.state?.sleepy && !wardy.state.patrolledToday)} />
-          {/* Wardy's speech bubble */}
-          <div className="relative rounded-card bg-surface-2 px-4 py-3">
-            <span aria-hidden className="absolute -top-1.5 left-14 h-3 w-3 rotate-45 bg-surface-2" />
-            <p className="relative text-body text-text-primary">{summaryLine(visible, readOnly)}</p>
+        readOnly ? (
+          <div className="space-y-3">
+            <ScoreDial score={score} />
+            <div className="relative rounded-card bg-surface-2 px-4 py-3">
+              <span aria-hidden className="absolute -top-1.5 left-14 h-3 w-3 rotate-45 bg-surface-2" />
+              <p className="relative text-body text-text-primary">{summaryLine(visible, readOnly)}</p>
+            </div>
           </div>
-          {!readOnly && (
-            <WardyPatrol
+        ) : (
+          <div className="space-y-4">
+            <WardyStage
+              locked={!!wardy.state && !adopted}
+              mood={wardyMood(false, !!wardy.state?.sleepy && !wardy.state.patrolledToday) ?? moodForScore(score)}
+              line={summaryLine(visible, readOnly)}
               state={wardy.state}
-              needsAdoption={!!wardy.state && !adopted}
-              adoptPrice={ADOPT_PRICE_SKR}
-              starting={signingIn}
+              eating={eating}
               gained={gained}
-              onAdopt={async () => {
-                // The payment is credited to the wallet that proved ownership, so sign in first.
-                if (!hasSession) {
-                  try {
-                    await signIn()
-                  } catch (e) {
-                    return toast('error', (e as Error).message)
-                  }
-                }
-                setAdoptOpen(true)
-              }}
+              onFeed={feed}
+              feeding={feeding}
+              onUnlock={startAdopt}
+              unlocking={signingIn}
+              unlockPrice={ADOPT_PRICE_SKR}
             />
-          )}
-        </div>
+            <ScoreBar score={score} />
+          </div>
+        )
       ) : null}
 
       {error && !loading && (

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Fingerprint, MessageSquareText, ScanSearch } from 'lucide-react'
-import { Wardy } from './Wardy'
+import { WardyStage } from './WardyStage'
+import { ADOPT_PRICE_SKR } from '../../api/_lib/constants'
+
+export const PENDING_ADOPT = 'wardy.pendingAdopt'
 import { useConnectWallet } from '@/lib/wallet'
 import { Button } from './Button'
 import { Sheet } from './Sheet'
@@ -17,48 +20,46 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
     else setPicker(true)
   }
 
-  return (
-    <section className="space-y-8 pt-8">
-      <div className="space-y-3">
-        <Wardy mood="happy" size={64} />
-        <h1 className="text-heading font-semibold">Your keys are safe. Is your wallet?</h1>
-        <p className="text-body text-text-secondary">
-          Meet Wardy. He finds what drainers use and fixes it with your fingerprint.
-        </p>
-      </div>
+  // Unlocking needs the wallet first; the Scan page opens the adopt sheet once it's connected.
+  const onUnlock = () => {
+    try {
+      sessionStorage.setItem(PENDING_ADOPT, '1')
+    } catch {
+      // Without storage the user just taps Unlock again after connecting.
+    }
+    onConnect()
+  }
 
-      <ol className="space-y-3">
+  return (
+    <section className="space-y-5 pt-4">
+      <h1 className="text-center text-heading font-semibold">Meet Wardy, your wallet’s guard</h1>
+
+      <WardyStage locked mood="sleepy" line="" state={null} onUnlock={onUnlock} unlocking={connecting} unlockPrice={ADOPT_PRICE_SKR} />
+      {error && <p className="text-center text-body-sm text-critical">{error}</p>}
+
+      <ul className="flex justify-center gap-5 text-caption text-text-secondary">
         {[
-          { icon: ScanSearch, title: 'Patrol', text: 'He checks your wallet.' },
-          { icon: MessageSquareText, title: 'Explain', text: 'In plain English.' },
-          { icon: Fingerprint, title: 'Fix', text: 'One tap, one fingerprint.' },
-        ].map(({ icon: Icon, title, text }, i) => (
-          <li key={title} className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-safe/[.14] text-safe">
-              <Icon size={20} aria-hidden />
-            </span>
-            <p className="text-body-sm">
-              <span className="font-medium text-text-primary">
-                {i + 1}. {title}:
-              </span>{' '}
-              <span className="text-text-secondary">{text}</span>
-            </p>
+          { icon: ScanSearch, label: 'Patrol' },
+          { icon: MessageSquareText, label: 'Explain' },
+          { icon: Fingerprint, label: 'Fix' },
+        ].map(({ icon: Icon, label }) => (
+          <li key={label} className="flex items-center gap-1.5">
+            <Icon size={16} className="text-safe" aria-hidden /> {label}
           </li>
         ))}
-      </ol>
+      </ul>
 
-      <div className="space-y-3">
-        <Button className="w-full" onClick={onConnect} loading={connecting}>
-          Scan my wallet
+      <div className="space-y-1 text-center">
+        <Button variant="ghost" className="w-full" onClick={onConnect}>
+          Scan my wallet for free
         </Button>
-        {error && <p className="text-body-sm text-critical">{error}</p>}
-        <p className="text-caption text-text-muted">Free. Wardy can’t move your funds or see your seed phrase.</p>
+        <p className="text-caption text-text-muted">Wardy can’t move your funds or see your seed phrase.</p>
       </div>
 
-      <div>
+      <div className="text-center">
         {!showLookup ? (
-          <button className="min-h-tap text-body-sm text-text-secondary underline underline-offset-4" onClick={() => setShowLookup(true)}>
-            Check a friend’s wallet instead
+          <button className="min-h-tap text-body-sm text-text-muted underline underline-offset-4" onClick={() => setShowLookup(true)}>
+            Check a friend’s wallet
           </button>
         ) : (
           <form
