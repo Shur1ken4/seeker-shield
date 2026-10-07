@@ -7,12 +7,14 @@ import { ScanPage } from './pages/ScanPage'
 import { WatchPage } from './pages/WatchPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { Playground } from './pages/Playground'
+import { Onboarding, shouldShowOnboarding } from './components/Onboarding'
 
 const PLAYGROUND = import.meta.env.DEV && new URLSearchParams(window.location.search).has('playground')
 
 export function App() {
   const [tab, setTab] = useState<Tab>('scan')
   const [proOpen, setProOpen] = useState(false)
+  const [intro, setIntro] = useState(() => !PLAYGROUND && shouldShowOnboarding())
   const [refreshKey, setRefreshKey] = useState(0)
   const bump = () => setRefreshKey((k) => k + 1)
   const goScan = () => setTab('scan')
@@ -29,11 +31,19 @@ export function App() {
             <ScanPage onFixed={bump} onGoToWatch={() => setTab('watch')} />
           </div>
           {tab === 'watch' && <WatchPage onGoToScan={goScan} onUpgrade={upgrade} key={refreshKey} />}
-          {tab === 'profile' && <ProfilePage onGoToScan={goScan} onUpgrade={upgrade} refreshKey={refreshKey} />}
+          {tab === 'profile' && <ProfilePage onGoToScan={goScan} onUpgrade={upgrade} refreshKey={refreshKey} onShowIntro={() => setIntro(true)} />}
         </main>
       </div>
       <BottomTabBar active={tab} onChange={setTab} />
       <ProSheet open={proOpen} onClose={() => setProOpen(false)} onChanged={bump} />
+      {intro && (
+        <Onboarding
+          onDone={() => {
+            setIntro(false)
+            setTab('scan')
+          }}
+        />
+      )}
     </ToastProvider>
   )
 }

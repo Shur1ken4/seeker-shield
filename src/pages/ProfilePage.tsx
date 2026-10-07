@@ -18,7 +18,7 @@ interface StatsData {
   history: { score: number; at: number }[]
 }
 
-export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan: () => void; onUpgrade: () => void; refreshKey: number }) {
+export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: { onGoToScan: () => void; onUpgrade: () => void; refreshKey: number; onShowIntro?: () => void }) {
   const { publicKey } = useWallet()
   const { hasSession, verified, signIn, signingIn } = useSession()
   const owner = publicKey?.toBase58()
@@ -116,6 +116,11 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey }: { onGoToScan:
           {pro?.proUntil ? 'Extend Pro' : pro?.freeMonthAvailable ? 'Claim free month' : 'Unlock Pro'}
         </Button>
       </div>
+      {onShowIntro && (
+        <button onClick={onShowIntro} className="mx-auto block min-h-tap text-body-sm text-text-muted underline underline-offset-4">
+          How Wardy works
+        </button>
+      )}
     </section>
   )
 }
