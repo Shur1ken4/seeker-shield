@@ -2,7 +2,7 @@ import { classify } from './classify.js'
 import { computeScore, scoreWord } from './score.js'
 import { kv } from './kv.js'
 import { loadScamList } from './scamlist.js'
-import { getAssetsByOwner, getJupiterInfo, getMints, getTokenAccounts, rpc } from './solana.js'
+import { getAssetsByOwner, getJupiterInfo, getMints, getSolUsd, getTokenAccounts, rpc } from './solana.js'
 import { SCAN_CACHE_SECONDS, TOKEN_2022_PROGRAM } from './constants.js'
 import type { CheckedToken, ScanResult, Severity } from './types.js'
 
@@ -73,6 +73,7 @@ export async function scanWallet(owner: string, { fresh = false } = {}): Promise
     tokenAccountCount: accounts.length,
     cached: false,
     solLamports: balance.value,
+    solUsd: await getSolUsd().catch(() => null),
     durationMs: Date.now() - started,
     tokens,
   }

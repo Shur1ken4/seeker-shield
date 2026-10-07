@@ -5,6 +5,9 @@ export const sol = (lamports: number) => {
   return v === 0 ? '0 SOL' : `${v < 0.001 ? v.toFixed(6) : v.toFixed(4)} SOL`
 }
 
+/** Lamports as dollars, e.g. "$1.03"; empty when the price is unknown. */
+export const lamportsUsd = (lamports: number, solUsd: number | null | undefined) => (!solUsd ? '' : lamports === 0 ? '$0' : usd((lamports / 1e9) * solUsd))
+
 export const usd = (v: number | null | undefined) =>
   v == null ? '' : v < 0.01 ? '<$0.01' : v.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: v < 100 ? 2 : 0 })
 

@@ -21,7 +21,7 @@ import { Wardy, moodForScore, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
 import { celebrate } from '@/lib/celebrate'
 import type { FixItem } from '@/lib/fixes'
-import { short, sol, timeAgo } from '@/lib/format'
+import { lamportsUsd, short, sol, timeAgo } from '@/lib/format'
 import { useExplanations, useHidden, useScan } from '@/lib/useScan'
 import { blockReason, defaultAction } from '../../api/_lib/guard'
 import { computeScore } from '../../api/_lib/score'
@@ -228,7 +228,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
             Fix {fixAll.length} issue{fixAll.length === 1 ? '' : 's'}
           </Button>
           <p className="text-caption text-text-muted">
-            {fixAllReclaim > 0 ? `Returns about ${sol(fixAllReclaim)}. ` : ''}Your tokens don’t move.
+            {fixAllReclaim > 0 ? `Wardy found you ${lamportsUsd(fixAllReclaim, data.solUsd) || sol(fixAllReclaim)}${data.solUsd ? ` (${sol(fixAllReclaim)})` : ''}. ` : ''}Your tokens don’t move.
           </p>
         </div>
       )}
@@ -344,7 +344,12 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
         onClose={() => setFixItems(null)}
         onAlerts={onGoToWatch}
         onDone={(r) => {
-          toast('success', r.reclaimedLamports > 0 ? `Done. ${sol(r.reclaimedLamports)} is back in your wallet.` : 'Done. Your wallet is safer.')
+          toast(
+            'success',
+            r.reclaimedLamports > 0
+              ? `Done. Wardy found you ${lamportsUsd(r.reclaimedLamports, data?.solUsd) || sol(r.reclaimedLamports)}, now back in your wallet.`
+              : 'Done. Your wallet is safer.',
+          )
           // Update the score now; markFixed also re-checks the chain a few times in the background.
           markFixed(r.fixedIds)
           // A perfect wallet deserves a moment.

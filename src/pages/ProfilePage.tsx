@@ -5,7 +5,7 @@ import { Button } from '@/components/Button'
 import { EmptyState } from '@/components/EmptyState'
 import { ScoreHistory } from '@/components/ScoreHistory'
 import { api } from '@/lib/api'
-import { short, sol } from '@/lib/format'
+import { lamportsUsd, short, sol } from '@/lib/format'
 import type { ProInfo } from '@/lib/pro'
 import { useSession } from '@/lib/wallet'
 import { readLocalStats } from '@/lib/localStats'
@@ -16,6 +16,7 @@ import { Flame } from 'lucide-react'
 interface StatsData {
   stats: { reclaimedLamports: number; fixed: number }
   history: { score: number; at: number }[]
+  solUsd: number | null
 }
 
 export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: { onGoToScan: () => void; onUpgrade: () => void; refreshKey: number; onShowIntro?: () => void }) {
@@ -84,8 +85,9 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: 
 
       <dl className="grid grid-cols-2 gap-3">
         <div className="rounded-card border border-border bg-surface-1 p-4">
-          <dt className="text-caption text-text-muted">SOL reclaimed</dt>
-          <dd className="mt-1 font-mono text-title font-medium">{sol(reclaimed).replace(' SOL', '')}</dd>
+          <dt className="text-caption text-text-muted">Money Wardy found you</dt>
+          <dd className="mt-1 text-title font-semibold text-safe">{lamportsUsd(reclaimed, stats?.solUsd) || sol(reclaimed)}</dd>
+          {stats?.solUsd ? <dd className="font-mono text-caption text-text-muted">{sol(reclaimed)}</dd> : null}
         </div>
         <div className="rounded-card border border-border bg-surface-1 p-4">
           <dt className="text-caption text-text-muted">Issues fixed</dt>

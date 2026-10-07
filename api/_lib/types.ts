@@ -42,6 +42,8 @@ export interface ScanResult {
   cached: boolean
   /** Native SOL in the wallet (lamports). */
   solLamports: number
+  /** USD price of SOL at scan time (null if unknown). */
+  solUsd: number | null
   /** How long the scan took, for the "what we checked" report. */
   durationMs: number
   /** Every token the scan looked at, so users can see the work, not just the problems. */

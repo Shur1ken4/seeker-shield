@@ -103,3 +103,14 @@ export async function getJupiterInfo(mints: string[]): Promise<Record<string, { 
   }
   return out
 }
+
+/** USD price of SOL (cached 5 minutes), so "money Wardy found" can be shown in dollars. Null if unknown. */
+export async function getSolUsd(): Promise<number | null> {
+  const { kv } = await import('./kv.js')
+  const cached = await kv.get<number>('price:sol')
+  if (cached) return cached
+  const { WSOL_MINT } = await import('./constants.js')
+  const price = (await getJupiterInfo([WSOL_MINT]))[WSOL_MINT]?.usdPrice ?? null
+  if (price) await kv.set('price:sol', price, { ex: 300 })
+  return price
+}
