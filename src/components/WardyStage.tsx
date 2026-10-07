@@ -131,8 +131,17 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onUp(true)}
       >
         <span aria-hidden className="absolute bottom-4 h-2 w-20 rounded-full bg-bg/40" />
-        <div key={reaction.anim} className={cn('relative mb-5', reaction.anim.split(' ')[0])}>
-          <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} />
+        <div key={reaction.anim} className={cn('relative mb-5', reaction.anim.split(' ')[0])} style={{ perspective: 500 }}>
+          {/* He leans toward your finger in 3D. */}
+          <div
+            style={{
+              transform: locked ? undefined : `rotateY(${look.x * 16}deg) rotateX(${-look.y * 10}deg)`,
+              transition: 'transform 160ms ease-out',
+              transformStyle: 'preserve-3d',
+            }}
+          >
+            <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} />
+          </div>
         </div>
 
         {locked && (

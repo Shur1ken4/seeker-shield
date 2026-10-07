@@ -51,3 +51,4 @@ Contrast at least 4.5:1 for text. Tap targets 48px. Every icon button has an ari
 - Moods follow the safety score: happy (90+), calm (70-89, blinks), worried (40-69, brows), alarmed (under 40, amber body, wide eyes); plus sleepy (missed days) and eating (after a fix).
 - Wardy speaks in first person in his speech bubble and alerts; the rest of the UI does not.
 - Motion is small and purposeful and is turned off with prefers-reduced-motion.
+- Wardy is the one place that isn't flat: a toy-like 3D look (shaded body, side wall for thickness, rim light, glossy reflection, eye glints) and a gentle 3D tilt toward the user's finger. Everything else in the UI stays flat.

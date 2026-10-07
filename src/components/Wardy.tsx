@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { cn } from '@/lib/cn'
 
 export type WardyMood = 'happy' | 'calm' | 'worried' | 'alarmed' | 'sleepy' | 'eating' | 'love' | 'excited'
@@ -32,10 +33,17 @@ export function Wardy({
   grey?: boolean
   className?: string
 }) {
-  const body = grey ? 'fill-cleanup' : mood === 'alarmed' ? 'fill-warning' : mood === 'sleepy' ? 'fill-cleanup' : 'fill-safe'
+  const tone = grey || mood === 'sleepy' ? 'cleanup' : mood === 'alarmed' ? 'warning' : 'safe'
+  const base = `rgb(var(--${tone}))`
   const ink = 'fill-bg stroke-bg'
-  const lx = Math.max(-1, Math.min(1, look?.x ?? 0)) * 6
-  const ly = Math.max(-1, Math.min(1, look?.y ?? 0)) * 5
+  const nx = Math.max(-1, Math.min(1, look?.x ?? 0))
+  const ny = Math.max(-1, Math.min(1, look?.y ?? 0))
+  const lx = nx * 6
+  const ly = ny * 5
+  // 3D look: unique gradient ids per instance, and a side wall that shifts opposite to where he looks.
+  const id = useId().replace(/:/g, '')
+  const depthX = -nx * 3
+  const depthY = 9 - ny * 2
   return (
     <svg
       viewBox="-10 -14 140 164"
@@ -45,8 +53,29 @@ export function Wardy({
       role="img"
       aria-label={`Wardy looks ${mood === 'eating' ? 'busy eating' : mood === 'love' ? 'loved' : mood}`}
     >
+      <defs>
+        <radialGradient id={`${id}-body`} cx="32%" cy="22%" r="85%">
+          <stop offset="0%" style={{ stopColor: `color-mix(in srgb, ${base} 70%, white)` }} />
+          <stop offset="55%" style={{ stopColor: base }} />
+          <stop offset="100%" style={{ stopColor: `color-mix(in srgb, ${base} 72%, black)` }} />
+        </radialGradient>
+        <linearGradient id={`${id}-side`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style={{ stopColor: `color-mix(in srgb, ${base} 55%, black)` }} />
+          <stop offset="100%" style={{ stopColor: `color-mix(in srgb, ${base} 35%, black)` }} />
+        </linearGradient>
+        <linearGradient id={`${id}-shine`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="white" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
       <g className="wardy-body">
-        <path d={SHIELD_PATH} className={cn(body, 'transition-colors duration-base')} />
+        {/* Thickness: the shield's side wall, peeking out below and beside the face. */}
+        <path d={SHIELD_PATH} fill={`url(#${id}-side)`} style={{ transform: `translate(${depthX}px, ${depthY}px)`, transition: 'transform 120ms ease-out' }} />
+        <path d={SHIELD_PATH} fill={`url(#${id}-body)`} />
+        {/* Rim light along the top edge, then a soft glossy reflection. */}
+        <path d="M60 3C45 12 27 18 4 18" fill="none" stroke="white" strokeOpacity="0.35" strokeWidth="3" strokeLinecap="round" />
+        <path d="M14 26C14 22 28 20 42 17C34 30 24 44 16 58C14 48 14 36 14 26Z" fill={`url(#${id}-shine)`} />
 
         {/* The face shifts toward wherever Wardy is looking. */}
         <g style={{ transform: `translate(${lx}px, ${ly}px)`, transition: 'transform 120ms ease-out' }}>
@@ -58,9 +87,13 @@ export function Wardy({
           )}
 
           {mood === 'calm' && (
-            <g className={cn(ink, 'wardy-eyes')} strokeWidth="0">
-              <ellipse cx="41" cy="66" rx="11" ry="15" />
-              <ellipse cx="79" cy="66" rx="11" ry="15" />
+            <g className="wardy-eyes">
+              <g className={ink} strokeWidth="0">
+                <ellipse cx="41" cy="66" rx="11" ry="15" />
+                <ellipse cx="79" cy="66" rx="11" ry="15" />
+              </g>
+              <circle cx="45" cy="59" r="3.2" fill="white" opacity="0.9" />
+              <circle cx="83" cy="59" r="3.2" fill="white" opacity="0.9" />
             </g>
           )}
 
@@ -69,6 +102,8 @@ export function Wardy({
               <g className="wardy-eyes" strokeWidth="0">
                 <ellipse cx="41" cy="70" rx="10" ry="13" />
                 <ellipse cx="79" cy="70" rx="10" ry="13" />
+                <circle cx="44.5" cy="64" r="2.8" fill="white" opacity="0.9" />
+                <circle cx="82.5" cy="64" r="2.8" fill="white" opacity="0.9" />
               </g>
               <path d="M28 50 L50 44" strokeWidth="6" strokeLinecap="round" className="fill-none" />
               <path d="M92 50 L70 44" strokeWidth="6" strokeLinecap="round" className="fill-none" />
