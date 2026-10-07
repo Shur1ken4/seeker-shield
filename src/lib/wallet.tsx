@@ -155,7 +155,7 @@ function SessionProvider({ children }: { children: ReactNode }) {
     if (!address || !signMessage) throw new Error('Connect your wallet first.')
     setSigningIn(true)
     try {
-      const { message } = await api.get<{ message: string }>(`/api/auth/nonce?address=${address}`)
+      const { message, ticket } = await api.get<{ message: string; ticket: string }>(`/api/auth/nonce?address=${address}`)
       let signature: Uint8Array
       try {
         signature = await signMessage(new TextEncoder().encode(message))
@@ -165,6 +165,8 @@ function SessionProvider({ children }: { children: ReactNode }) {
       const res = await api.post<{ token: string; verified: boolean; sgtMint: string | null; address: string }>('/api/auth/verify', {
         address,
         signature: bs58.encode(signature),
+        message,
+        ticket,
       })
       setToken(res.token)
       const next = { address: res.address, verified: res.verified, sgtMint: res.sgtMint }

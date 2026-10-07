@@ -4,7 +4,7 @@ import { Check, Fingerprint } from 'lucide-react'
 import { api } from '@/lib/api'
 import { confirmSignature } from '@/lib/fixes'
 import { buildProPayment, type ProInfo } from '@/lib/pro'
-import { friendlyWalletError } from '@/lib/wallet'
+import { friendlyWalletError, useSession } from '@/lib/wallet'
 import { Button } from './Button'
 import { Sheet } from './Sheet'
 import { Spinner } from './Spinner'
@@ -16,6 +16,7 @@ type Step = 'info' | 'paying' | 'verifying' | 'done'
 export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClose: () => void; onAdopted: () => void }) {
   const { connection } = useConnection()
   const { publicKey, sendTransaction } = useWallet()
+  const { hasSession, signIn } = useSession()
   const [info, setInfo] = useState<ProInfo | null>(null)
   const [step, setStep] = useState<Step>('info')
   const [error, setError] = useState<string | null>(null)
@@ -33,6 +34,8 @@ export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClos
     setBusy(true)
     setError(null)
     try {
+      // The unlock is credited to the wallet that proved ownership: sign in first, from this tap.
+      if (!hasSession) await signIn()
       if (info.testMode) {
         // No payment in test mode; the server only allows this while PAYMENTS_TEST_MODE is on.
         await api.post('/api/pro/test-unlock')

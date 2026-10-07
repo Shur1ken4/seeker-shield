@@ -1,6 +1,5 @@
 import { fail, isWalletAddress, json, rateLimit } from '../../_lib/http.js'
-import { kv } from '../../_lib/kv.js'
-import { newToken } from '../../_lib/session.js'
+import { newToken, sign } from '../../_lib/session.js'
 import { signInMessage } from '../../_lib/signin.js'
 
 export async function GET(req: Request) {
@@ -11,7 +10,6 @@ export async function GET(req: Request) {
   const nonce = newToken().slice(0, 16)
   const domain = new URL(req.url).host
   const message = signInMessage({ domain, address, nonce, issuedAt: new Date().toISOString() })
-  // The message is stored server-side: verify only accepts this exact text, once, within 5 minutes.
-  await kv.set(`nonce:${address}`, message, { ex: 300 })
-  return json({ message })
+  // A signed ticket ties this exact message to this address; verify accepts it within 5 minutes.
+  return json({ message, ticket: sign(`${address}\n${message}`) })
 }

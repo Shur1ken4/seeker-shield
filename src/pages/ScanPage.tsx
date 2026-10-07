@@ -146,17 +146,8 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readOnly, wardy.state, adopted])
 
-  const startAdopt = async () => {
-    // The payment is credited to the wallet that proved ownership, so sign in first.
-    if (!hasSession) {
-      try {
-        await signIn()
-      } catch (e) {
-        return toast('error', (e as Error).message)
-      }
-    }
-    setAdoptOpen(true)
-  }
+  // Just open the sheet; it signs in from the user's tap there (Android only opens the wallet from a real tap).
+  const startAdopt = () => setAdoptOpen(true)
 
   const visible = useMemo(() => data?.findings.filter((f) => !hidden.has(f.mint)) ?? [], [data, hidden])
   const hiddenCount = (data?.findings.length ?? 0) - visible.length
