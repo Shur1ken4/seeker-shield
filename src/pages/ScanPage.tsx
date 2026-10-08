@@ -62,7 +62,7 @@ function moodLine(mood: WardyMood, fed: boolean) {
   }
 }
 
-export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoToWatch?: () => void }) {
+export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () => void; onGoToWatch?: () => void; onShowIntro?: () => void }) {
   const { publicKey, disconnect } = useWallet()
   // ?check=<address> opens a read-only scan (used by Telegram alert links for friends' wallets).
   const [lookup, setLookup] = useState<string | null>(() => {
@@ -162,7 +162,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   )
   const fixAllReclaim = fixAll.filter((i) => i.action === 'close').reduce((s, i) => s + i.finding.rentLamports, 0)
 
-  if (!owner) return <ConnectHero onLookup={setLookup} />
+  if (!owner) return <ConnectHero onLookup={setLookup} onShowIntro={onShowIntro} />
 
   const actionsFor = (f: Finding): { primary?: FindingAction; secondary?: FindingAction[] } => {
     const act = defaultAction(f)

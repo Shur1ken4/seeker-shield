@@ -3,7 +3,8 @@ import { Flame, Sparkles, Trash2, X } from 'lucide-react'
 import { Button } from './Button'
 import { Wardy } from './Wardy'
 
-export const ONBOARDED_KEY = 'wardy.onboarded'
+// Bump the version to show an updated intro once more to everyone.
+export const ONBOARDED_KEY = 'wardy.onboarded.v2'
 const STEP_MS = 3500
 
 export function shouldShowOnboarding() {

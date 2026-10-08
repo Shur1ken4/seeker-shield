@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Play } from 'lucide-react'
 import { WardyStage } from './WardyStage'
 import { ADOPT_PRICE_SKR } from '../../api/_lib/constants'
 
@@ -7,7 +8,7 @@ import { useConnectWallet } from '@/lib/wallet'
 import { Button } from './Button'
 import { Sheet } from './Sheet'
 
-export function ConnectHero({ onLookup }: { onLookup: (address: string) => void }) {
+export function ConnectHero({ onLookup, onShowIntro }: { onLookup: (address: string) => void; onShowIntro?: () => void }) {
   const { options, preferred, connectWith, connecting, error } = useConnectWallet()
   const [picker, setPicker] = useState(false)
   const [addr, setAddr] = useState('')
@@ -34,6 +35,11 @@ export function ConnectHero({ onLookup }: { onLookup: (address: string) => void 
       <div className="space-y-2 text-center">
         <h1 className="text-heading font-semibold">Keep your Seeker wallet safe</h1>
         <p className="text-body text-text-secondary">Wardy finds risky app access, fake tokens and stuck SOL, and fixes them with one tap.</p>
+        {onShowIntro && (
+          <button onClick={onShowIntro} className="mx-auto inline-flex min-h-tap items-center gap-2 rounded-full border border-border px-4 text-body-sm text-text-secondary active:bg-surface-2">
+            <Play size={14} className="fill-current text-safe" aria-hidden /> How Wardy works · 15s
+          </button>
+        )}
       </div>
 
       <div className="space-y-2 text-center">
