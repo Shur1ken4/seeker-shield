@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
-import { Check, Flame, Lock, Sparkles, Utensils } from 'lucide-react'
+import { BellRing, Check, Flame, Lock, Sparkles, TrendingUp, Utensils } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Button } from './Button'
 import { Wardy, type WardyMood } from './Wardy'
@@ -171,11 +171,33 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
       </div>
 
       {locked ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
+          {/* The value in one glance: free means you check; Wardy checks for you. */}
+          <div className="grid grid-cols-2 gap-2 text-caption">
+            <div className="rounded-chip bg-surface-2 p-3">
+              <p className="font-medium text-text-secondary">Free</p>
+              <p className="mt-1 text-text-muted">You remember to check</p>
+            </div>
+            <div className="rounded-chip border border-safe/40 bg-safe/[.08] p-3">
+              <p className="font-medium text-safe">With Wardy</p>
+              <p className="mt-1 text-text-secondary">He checks for you</p>
+            </div>
+          </div>
+          <ul className="space-y-1.5 text-body-sm">
+            {[
+              { icon: BellRing, text: 'Telegram alert if something lands' },
+              { icon: Flame, text: 'Daily streak earns free Pro days' },
+              { icon: TrendingUp, text: 'He grows as your wallet stays safe' },
+            ].map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-2 text-text-secondary">
+                <Icon size={16} className="shrink-0 text-safe" aria-hidden /> {text}
+              </li>
+            ))}
+          </ul>
           <Button className="w-full" variant="reward" onClick={onUnlock} loading={unlocking}>
             <Sparkles size={18} aria-hidden /> Unlock Wardy · {unlockPrice} SKR
           </Button>
-          <p className="text-center text-caption text-text-muted">One time, about $0.90. Daily patrols, streaks and alerts.</p>
+          <p className="text-center text-caption text-text-muted">One time, about $0.90.</p>
         </div>
       ) : (
         state && (
@@ -193,9 +215,16 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
               <div className="h-full rounded-full bg-safe transition-all duration-base" style={{ width: `${progress * 100}%` }} />
             </div>
             {state.patrolledToday ? (
-              <p className="flex items-center justify-center gap-1 text-body-sm text-safe">
-                <Check size={16} aria-hidden /> Fed with today’s scan · free Pro in {state.daysToReward} day{state.daysToReward === 1 ? '' : 's'}
-              </p>
+              <div className="rounded-chip bg-surface-2 px-3 py-2 text-center">
+                <p className="flex items-center justify-center gap-1 text-body-sm text-safe">
+                  <Check size={16} aria-hidden /> Fed with today’s scan
+                </p>
+                {/* The reason to come back, spelled out. */}
+                <p className="mt-0.5 text-caption text-text-secondary">
+                  Tomorrow: {state.streak + 1}-day streak
+                  {state.daysToReward - 1 <= 0 ? ' and 3 free Pro days' : ` · free Pro in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
+                </p>
+              </div>
             ) : (
               <Button className="w-full" onClick={onFeed} loading={feeding}>
                 <Utensils size={18} aria-hidden /> Scan & feed Wardy
