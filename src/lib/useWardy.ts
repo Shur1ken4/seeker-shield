@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from './api'
-import type { WardyState } from '../../api/_lib/types'
+import type { ChestPrize, WardyState } from '../../api/_lib/types'
 
 export interface PatrolResult {
   state: WardyState
@@ -11,6 +11,8 @@ export interface PatrolResult {
   levelUp: boolean
   /** The scan came back clean: Wardy got the bonus treat. */
   clean: boolean
+  /** Every 7th streak day: a chest with a random prize. */
+  chest: ChestPrize | null
 }
 
 /**

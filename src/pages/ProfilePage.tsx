@@ -76,7 +76,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: 
             <p className="mt-1 inline-flex items-center gap-1 text-caption text-text-muted">
               <Flame size={14} className={wardy.state.streak ? 'text-warning' : ''} aria-hidden />
               {wardy.state.streak}-day streak · best {wardy.state.bestStreak}
-              {wardy.state.rewards ? ` · ${wardy.state.rewards * 3} free Pro days earned` : ''}
+              {wardy.state.rewards ? ` · ${wardy.state.rewards} chest${wardy.state.rewards === 1 ? '' : 's'} opened` : ''}
             </p>
             <p className="mt-1 text-caption text-safe">{nextEvolution(wardy.state.level)}</p>
           </div>

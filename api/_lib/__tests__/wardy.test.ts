@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyPatrol, applySnacks, levelFor, toState, SNACKS_PER_DAY, SNACK_XP, type WardyRecord } from '../wardy'
+import { applyPatrol, applySnacks, drawChest, levelFor, toState, SNACKS_PER_DAY, SNACK_XP, type WardyRecord } from '../wardy'
 
 const day = (d: string) => Date.parse(`${d}T12:00:00Z`)
 const fresh: WardyRecord = { xp: 0, streak: 0, bestStreak: 0, lastPatrol: null, snackDay: null, snacks: 0, rewards: 0 }
@@ -48,6 +48,20 @@ describe('Wardy patrols', () => {
     const clean = applyPatrol(fresh, day('2026-10-07'), true)
     expect(clean.gained - plain.gained).toBe(5)
     expect(clean.clean).toBe(true)
+  })
+
+  it('opens a chest on every 7th streak day with a prize from the table', () => {
+    let r = fresh
+    const chests = []
+    for (let i = 1; i <= 7; i++) {
+      const res = applyPatrol(r, day(`2026-10-0${i}`), false, 0.95)
+      if (res.chest) chests.push(res.chest)
+      r = res.record
+    }
+    expect(chests).toEqual([{ kind: 'xp', xp: 50 }])
+    expect(drawChest(0.1)).toEqual({ kind: 'pro', days: 2 })
+    expect(drawChest(0.5)).toEqual({ kind: 'pro', days: 3 })
+    expect(drawChest(0.8)).toEqual({ kind: 'pro', days: 5 })
   })
 
   it('maps XP to levels', () => {

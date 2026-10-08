@@ -3,6 +3,8 @@ import { Wardy, type WardyMood } from '@/components/Wardy'
 import { WardyStage } from '@/components/WardyStage'
 import { ScoreBar } from '@/components/ScoreDial'
 import { celebrate } from '@/lib/celebrate'
+import { ChestSheet } from '@/components/ChestSheet'
+import { Button } from '@/components/Button'
 import type { WardyState } from '../../api/_lib/types'
 
 const MOODS: WardyMood[] = ['happy', 'calm', 'worried', 'alarmed', 'sleepy', 'eating', 'love', 'excited']
@@ -15,9 +17,12 @@ export function Playground() {
   })
   const [eating, setEating] = useState(false)
   const [gained, setGained] = useState<number | null>(null)
+  const [chest, setChest] = useState(false)
   return (
     <section className="space-y-6 pt-2">
       <ScoreBar score={96} />
+      <Button variant="secondary" className="w-full" onClick={() => setChest(true)}>Preview streak chest</Button>
+      <ChestSheet prize={chest ? { kind: 'pro', days: 5 } : null} streak={7} onClose={() => setChest(false)} />
       <WardyStage
         compact
         locked={false}

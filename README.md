@@ -45,7 +45,7 @@ Security apps get opened once and forgotten. Wardy is a small shield character w
 - **Daily patrol = his meal:** opening the app runs the scan; the first patrol each day feeds him, grows his XP and keeps your streak.
 - **He eats the trash:** every fix (removed access, closed account, destroyed fake token) is a snack, verified on-chain and capped per day so self-sent spam earns nothing.
 - **He naps, never dies:** miss a day and he's asleep when you return, no guilt. The streak restarts; XP is never taken away.
-- **Streaks pay in Pro:** every 7-day streak adds 3 free days of Wardy Pro. No token payouts, so nothing to farm.
+- **Streak chests:** every 7th day of your streak, Wardy finds a chest: a random prize of Pro days or an XP boost. Earned, never bought.
 - **He nudges you:** if you haven't patrolled by evening, Wardy sends one Telegram reminder to keep your streak.
 - **He grows:** Pup, Scout, Guard, Knight, Sentinel, Legend. Cosmetic only; levels never change what's checked or allowed.
 
@@ -56,6 +56,8 @@ Security apps get opened once and forgotten. Wardy is a small shield character w
 | Free | 0 | Scans, plain-English explanations, every fix including "Fix all" |
 | Adopt Wardy | 50 SKR once (about $0.90) | The pet, daily patrols, streaks, Telegram alerts, 2 friends' wallets |
 | Wardy Pro | 150 SKR a month (about $2.60) | Instant alerts, 5 friends' wallets, score history |
+
+**Revenue flows back to users (roadmap):** 20% of unlocks, Pro, and a future 5% fee on SOL Wardy recovers (waived with a 7-day streak or Pro) fund a Wardy Treasury pool. As it grows, streak chests start including SKR prizes and Wardy collectibles, limited to Seeker Verified wallets so bots can't farm them. Chests are earned by streaks, never purchased.
 
 For comparison: Revoke.cash charges $1.50 per batch revoke and $99 a year for Premium; Webacy Pro is $10 a month. Safety itself is never paywalled. Payments are plain SKR transfers to the treasury, verified on-chain by the server and redeemable once.
 

@@ -185,3 +185,16 @@ body {
   60% { filter: none; transform: scale(1.08); }
   100% { filter: none; transform: scale(1); }
 }
+
+/* Streak chest */
+.chest-wiggle { animation: chest-wiggle 1.4s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes chest-wiggle {
+  0%, 60%, 100% { transform: rotate(0); }
+  70% { transform: rotate(-5deg); }
+  80% { transform: rotate(5deg); }
+  90% { transform: rotate(-3deg); }
+}
+@keyframes chest-prize {
+  0% { opacity: 0; transform: translateY(30px) scale(0.6); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}

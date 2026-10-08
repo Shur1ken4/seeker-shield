@@ -17,6 +17,8 @@ import { useWardy } from '@/lib/useWardy'
 import { WardyStage } from '@/components/WardyStage'
 import { PENDING_ADOPT } from '@/components/ConnectHero'
 import { AdoptSheet } from '@/components/AdoptSheet'
+import { ChestSheet } from '@/components/ChestSheet'
+import type { ChestPrize } from '../../api/_lib/types'
 import { Wardy, moodForScore, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
 import { celebrate } from '@/lib/celebrate'
@@ -80,6 +82,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
   const [eating, setEating] = useState(false)
   const [gained, setGained] = useState<number | null>(null)
   const [adoptOpen, setAdoptOpen] = useState(false)
+  const [chest, setChest] = useState<{ prize: ChestPrize; streak: number } | null>(null)
   const adopted = !!wardy.state?.adopted
 
   // Scanning IS feeding: the day's first scan of your own wallet is Wardy's meal (counted once per day on the server).
@@ -105,10 +108,8 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
         celebrate('big')
         toast('success', `Wardy grew to level ${r.state.level}: ${r.state.levelName}.`)
       }
-      if (r.rewardProDays) {
-        celebrate('big')
-        toast('success', `${r.state.streak}-day streak. ${r.rewardProDays} free Pro days.`)
-      }
+      // Streak chest: a moment of its own, opened by the user.
+      if (r.chest) window.setTimeout(() => setChest({ prize: r.chest!, streak: r.state.streak }), 1200)
   }
 
   /** "Scan & feed Wardy": sign in if needed (needs a tap), then scan, then he eats it. */
@@ -320,6 +321,8 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
       )}
 
       {!readOnly && data && <DemoPermission onDone={rescan} />}
+
+      <ChestSheet prize={chest?.prize ?? null} streak={chest?.streak ?? 7} onClose={() => setChest(null)} />
 
       <AdoptSheet
         open={adoptOpen}

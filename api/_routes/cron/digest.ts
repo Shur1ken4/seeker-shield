@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     if (!w.adopted || w.patrolledToday) continue
     if (!(await kv.set(`tg:nudge:${user}:${today}`, 1, { ex: 2 * 86400, nx: true }))) continue
     const text = w.streak
-      ? `Wardy hasn’t patrolled today. Open Wardy to keep your ${w.streak}-day streak${w.daysToReward <= 2 ? ` (free Pro in ${w.daysToReward} day${w.daysToReward === 1 ? '' : 's'})` : ''}.`
+      ? `Wardy hasn’t patrolled today. Open Wardy to keep your ${w.streak}-day streak${w.daysToReward <= 2 ? ` (chest in ${w.daysToReward} day${w.daysToReward === 1 ? '' : 's'})` : ''}.`
       : 'Wardy is napping. Wake him up for a quick patrol.'
     if (await sendTelegram(chatId, text, env.appUrl ? { text: 'Open Wardy', url: env.appUrl } : undefined)) nudged++
   }

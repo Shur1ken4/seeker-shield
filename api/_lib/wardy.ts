@@ -19,7 +19,25 @@ export const CLEAN_TREAT_XP = 5
 export const SNACK_XP = 5
 export const SNACKS_PER_DAY = 6 // so airdropping yourself spam to "feed" Wardy earns nothing extra
 export const STREAK_FOR_REWARD = 7
-export const REWARD_PRO_DAYS = 3
+export const REWARD_PRO_DAYS = 3 // average-ish; the chest decides the actual prize
+
+/** What a streak chest can hold. Earned by streaks, never bought; no money prizes yet. */
+import type { ChestPrize } from './types.js'
+export type { ChestPrize }
+const CHEST_TABLE: { p: number; prize: ChestPrize }[] = [
+  { p: 0.4, prize: { kind: 'pro', days: 2 } },
+  { p: 0.35, prize: { kind: 'pro', days: 3 } },
+  { p: 0.15, prize: { kind: 'pro', days: 5 } },
+  { p: 0.1, prize: { kind: 'xp', xp: 50 } },
+]
+export function drawChest(rand = Math.random()): ChestPrize {
+  let acc = 0
+  for (const row of CHEST_TABLE) {
+    acc += row.p
+    if (rand < acc) return row.prize
+  }
+  return CHEST_TABLE[0].prize
+}
 
 export interface WardyRecord {
   xp: number
@@ -72,22 +90,23 @@ export async function getWardy(address: string) {
 }
 
 /** Pure step function for a daily patrol, so the rules are unit-testable. */
-export function applyPatrol(r: WardyRecord, now = Date.now(), clean = false) {
+export function applyPatrol(r: WardyRecord, now = Date.now(), clean = false, rand = Math.random()) {
   const today = dayOf(now)
-  if (r.lastPatrol === today) return { record: r, gained: 0, already: true, reward: false, napped: false, clean: false }
+  if (r.lastPatrol === today) return { record: r, gained: 0, already: true, reward: false, napped: false, clean: false, chest: null as ChestPrize | null }
   const gap = r.lastPatrol ? daysBetween(r.lastPatrol, today) : null
   const streak = gap === 1 ? r.streak + 1 : 1
   const gained = PATROL_XP + Math.min(streak - 1, 10) + (clean ? CLEAN_TREAT_XP : 0)
   const reward = streak % STREAK_FOR_REWARD === 0
+  const chest = reward ? drawChest(rand) : null
   const record: WardyRecord = {
     ...r,
-    xp: r.xp + gained,
+    xp: r.xp + gained + (chest?.kind === 'xp' ? chest.xp : 0),
     streak,
     bestStreak: Math.max(r.bestStreak, streak),
     lastPatrol: today,
     rewards: r.rewards + (reward ? 1 : 0),
   }
-  return { record, gained, already: false, reward, napped: gap !== null && gap > 1, clean }
+  return { record, gained, already: false, reward, napped: gap !== null && gap > 1, clean, chest }
 }
 
 export function applySnacks(r: WardyRecord, count: number, now = Date.now()) {
@@ -102,18 +121,19 @@ export async function patrol(address: string) {
   // Clean-wallet treat: judged from the server's own latest scan of this wallet, never from the client.
   const scan = await kv.get<{ score: number }>(`scan:${address}`)
   const res = applyPatrol(r, Date.now(), (scan?.score ?? 0) >= 90)
-  if (res.already) return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false, clean: false }
+  if (res.already) return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false, clean: false, chest: null }
   // One patrol per day per wallet, even if two requests race.
   if (!(await kv.set(`wardy:patrol:${address}:${res.record.lastPatrol}`, 1, { ex: 2 * 86400, nx: true }))) {
-    return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false, clean: false }
+    return { state: toState(r), gained: 0, already: true, rewardProDays: 0, napped: false, levelUp: false, clean: false, chest: null }
   }
   await kv.set(`wardy:${address}`, res.record)
-  if (res.reward) await extendPro(address, REWARD_PRO_DAYS)
+  if (res.chest?.kind === 'pro') await extendPro(address, res.chest.days)
   return {
     state: toState(res.record),
     gained: res.gained,
     already: false,
-    rewardProDays: res.reward ? REWARD_PRO_DAYS : 0,
+    rewardProDays: res.chest?.kind === 'pro' ? res.chest.days : 0,
+    chest: res.chest,
     napped: res.napped,
     levelUp: levelFor(res.record.xp).level > levelFor(r.xp).level,
     clean: res.clean,

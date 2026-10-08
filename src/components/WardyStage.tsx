@@ -186,7 +186,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
           <ul className="space-y-1.5 text-body-sm">
             {[
               { icon: BellRing, text: 'Telegram alert if something lands' },
-              { icon: Flame, text: 'Daily streak earns free Pro days' },
+              { icon: Flame, text: 'Streak chests every 7 days' },
               { icon: TrendingUp, text: 'He grows as your wallet stays safe' },
             ].map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-2 text-text-secondary">
@@ -222,7 +222,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
                 {/* The reason to come back, spelled out. */}
                 <p className="mt-0.5 text-caption text-text-secondary">
                   Tomorrow: {state.streak + 1}-day streak
-                  {state.daysToReward - 1 <= 0 ? ' and 3 free Pro days' : ` · free Pro in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
+                  {state.daysToReward - 1 <= 0 ? ' and a chest' : ` · chest in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
                 </p>
               </div>
             ) : (

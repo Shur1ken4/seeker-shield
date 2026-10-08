@@ -46,7 +46,7 @@ const SLIDES: Slide[] = [
   },
   {
     title: 'Scan daily, earn rewards',
-    body: 'Your daily scan feeds him. Keep the streak, earn free Pro.',
+    body: 'Your daily scan feeds him. Keep the streak, open a chest every 7 days.',
     art: (
       <div className="relative">
         <Wardy mood="happy" size={128} level={4} />

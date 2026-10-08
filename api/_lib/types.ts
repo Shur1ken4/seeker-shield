@@ -94,3 +94,6 @@ export interface WardyState {
   /** Paid the one-time adoption. Only present on GET /api/wardy. */
   adopted?: boolean
 }
+
+/** What a streak chest holds (see api/_lib/wardy.ts). */
+export type ChestPrize = { kind: 'pro'; days: number } | { kind: 'xp'; xp: number }
