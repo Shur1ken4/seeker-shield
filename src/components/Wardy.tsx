@@ -91,9 +91,6 @@ export function Wardy({
         <path d="M14 26C14 22 28 20 42 17C34 30 24 44 16 58C14 48 14 36 14 26Z" fill={`url(#${id}-shine)`} />
 
         {/* Evolution gear */}
-        {level >= 2 && (
-          <path d="M60 110l3.2 6.6 7.3 1-5.3 5.1 1.3 7.2-6.5-3.4-6.5 3.4 1.3-7.2-5.3-5.1 7.3-1z" fill="#F5D76E" stroke="#B8901F" strokeWidth="1.2" />
-        )}
         {level >= 4 && level < 6 && !HATS.has(outfit) && (
           <path d="M60 2C56 -10 62 -22 74 -24C70 -16 72 -8 66 0Z" fill="#FF7A6B" stroke="#C9483A" strokeWidth="1.2" />
         )}
@@ -174,7 +171,8 @@ export function Wardy({
             </g>
           )}
           {outfit === 'shades' && (
-            <g>
+            // Pushed up onto his forehead whenever his eyes carry the mood.
+            <g transform={SHADES_UP.has(mood) ? 'translate(6 -32) scale(0.9)' : undefined}>
               <rect x="24" y="54" width="34" height="22" rx="8" fill="#111412" />
               <rect x="62" y="54" width="34" height="22" rx="8" fill="#111412" />
               <path d="M58 62 H62" stroke="#111412" strokeWidth="4" />
@@ -184,10 +182,20 @@ export function Wardy({
           )}
         </g>
         <OutfitLayer outfit={outfit} />
+        {/* Evolution star; drawn after the outfit so it becomes a pin on the scarf. */}
+        {level >= 2 && (
+          <path
+            d="M60 110l3.2 6.6 7.3 1-5.3 5.1 1.3 7.2-6.5-3.4-6.5 3.4 1.3-7.2-5.3-5.1 7.3-1z"
+            fill="#F5D76E"
+            stroke="#B8901F"
+            strokeWidth="1.2"
+            transform={outfit === 'scarf' ? 'translate(0 6)' : undefined}
+          />
+        )}
       </g>
 
       {mood === 'sleepy' && (
-        <text x="104" y="6" className="wardy-z fill-text-muted font-sans" fontSize="22" fontWeight="600">
+        <text x="104" y={outfit === 'cap' ? -8 : 6} className="wardy-z fill-text-muted font-sans" fontSize="22" fontWeight="600">
           z
         </text>
       )}
@@ -196,6 +204,7 @@ export function Wardy({
 }
 
 const HATS = new Set<OutfitId>(['cap', 'party', 'wizard', 'headphones'])
+const SHADES_UP = new Set<WardyMood>(['calm', 'worried', 'alarmed', 'sleepy', 'love'])
 
 /** Hats, headphones and the scarf, drawn in Wardy's 120 x 140 shield space. */
 function OutfitLayer({ outfit }: { outfit: OutfitId }) {
@@ -237,9 +246,10 @@ function OutfitLayer({ outfit }: { outfit: OutfitId }) {
     case 'scarf':
       return (
         <g>
-          <path d="M14 96 Q60 116 106 96 L104 110 Q60 130 16 110 Z" fill="#9945FF" stroke="#6B2FC7" strokeWidth="2" />
-          <path d="M88 108 L98 136 L84 134 L80 112 Z" fill="#9945FF" stroke="#6B2FC7" strokeWidth="2" />
-          <path d="M24 103 Q60 120 96 103" fill="none" stroke="#14F195" strokeWidth="3" />
+          {/* Sits low, below his mouth, so every expression stays visible. */}
+          <path d="M84 120 L96 142 L82 141 L76 124 Z" fill="#9945FF" stroke="#6B2FC7" strokeWidth="2" strokeLinejoin="round" />
+          <path d="M17 110 Q60 126 103 110 L92 124 Q60 138 28 124 Z" fill="#9945FF" stroke="#6B2FC7" strokeWidth="2" strokeLinejoin="round" />
+          <path d="M23 116 Q60 131 97 116" fill="none" stroke="#14F195" strokeWidth="3" />
         </g>
       )
     default:

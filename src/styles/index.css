@@ -198,3 +198,11 @@ body {
   0% { opacity: 0; transform: translateY(30px) scale(0.6); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Reduce motion: Wardy holds still (a 0.01ms infinite blink would leave his eyes flickering shut). */
+@media (prefers-reduced-motion: reduce) {
+  .wardy *,
+  .wardy-body {
+    animation: none !important;
+  }
+}

@@ -22,6 +22,15 @@ export function Playground() {
   return (
     <section className="space-y-6 pt-2">
       <div className="rounded-card border border-border bg-surface-1 p-4"><LookPicker onChosen={() => {}} /></div>
+      <div id="moodgrid" className="grid grid-cols-8 gap-1 rounded-card border border-border bg-surface-1 p-2">
+        {(['classic', 'cap', 'party', 'headphones', 'shades', 'wizard', 'scarf'] as const).flatMap((o) =>
+          (['happy', 'calm', 'worried', 'alarmed', 'sleepy', 'eating', 'love', 'excited'] as const).map((m) => (
+            <div key={o + m} className="flex justify-center py-1">
+              <Wardy mood={m} size={40} outfit={o} level={2} />
+            </div>
+          )),
+        )}
+      </div>
       <ScoreBar score={96} />
       <Button variant="secondary" className="w-full" onClick={() => setChest(true)}>Preview streak chest</Button>
       <ChestSheet prize={chest ? { kind: 'pro', days: 5 } : null} streak={7} onClose={() => setChest(false)} />
