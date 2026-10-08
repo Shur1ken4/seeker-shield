@@ -1,6 +1,6 @@
 import { kv } from './kv.js'
 import { extendPro } from './pro.js'
-import type { WardyState } from './types.js'
+import type { OutfitId, WardyState } from './types.js'
 export type { WardyState } from './types.js'
 
 /** Wardy's growth. Cosmetic only: levels never change what the app checks or allows. */
@@ -86,7 +86,8 @@ async function load(address: string) {
 }
 
 export async function getWardy(address: string) {
-  return { ...toState(await load(address)), adopted: !!(await kv.get(`adopted:${address}`)) }
+  const [r, adopted, outfit] = await Promise.all([load(address), kv.get(`adopted:${address}`), kv.get<OutfitId>(`outfit:${address}`)])
+  return { ...toState(r), adopted: !!adopted, outfit: outfit ?? null }
 }
 
 /** Pure step function for a daily patrol, so the rules are unit-testable. */

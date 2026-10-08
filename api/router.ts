@@ -21,6 +21,7 @@ import * as r_telegram_link from './_routes/telegram/link.js'
 import * as r_telegram_test from './_routes/telegram/test.js'
 import * as r_telegram_webhook from './_routes/telegram/webhook.js'
 import * as r_wardy from './_routes/wardy.js'
+import * as r_wardy_outfit from './_routes/wardy/outfit.js'
 import * as r_wardy_patrol from './_routes/wardy/patrol.js'
 import * as r_watch from './_routes/watch.js'
 
@@ -46,6 +47,7 @@ const routes: Record<string, Partial<Record<string, Handler>>> = {
   'telegram/test': r_telegram_test,
   'telegram/webhook': r_telegram_webhook,
   'wardy': r_wardy,
+  'wardy/outfit': r_wardy_outfit,
   'wardy/patrol': r_wardy_patrol,
   'watch': r_watch,
 }

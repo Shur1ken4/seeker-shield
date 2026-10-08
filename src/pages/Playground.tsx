@@ -5,6 +5,7 @@ import { ScoreBar } from '@/components/ScoreDial'
 import { celebrate } from '@/lib/celebrate'
 import { ChestSheet } from '@/components/ChestSheet'
 import { Button } from '@/components/Button'
+import { LookPicker } from '@/components/LookPicker'
 import type { WardyState } from '../../api/_lib/types'
 
 const MOODS: WardyMood[] = ['happy', 'calm', 'worried', 'alarmed', 'sleepy', 'eating', 'love', 'excited']
@@ -20,6 +21,7 @@ export function Playground() {
   const [chest, setChest] = useState(false)
   return (
     <section className="space-y-6 pt-2">
+      <div className="rounded-card border border-border bg-surface-1 p-4"><LookPicker onChosen={() => {}} /></div>
       <ScoreBar score={96} />
       <Button variant="secondary" className="w-full" onClick={() => setChest(true)}>Preview streak chest</Button>
       <ChestSheet prize={chest ? { kind: 'pro', days: 5 } : null} streak={7} onClose={() => setChest(false)} />
@@ -39,6 +41,14 @@ export function Playground() {
         }}
       />
       <WardyStage compact locked mood="sleepy" line="" state={null} unlockPrice={50} onUnlock={() => celebrate('big')} />
+      <div className="flex items-end justify-around rounded-card border border-border bg-surface-1 p-4">
+        {(['classic', 'cap', 'party', 'headphones', 'shades', 'wizard', 'scarf'] as const).map((o) => (
+          <div key={o} className="flex flex-col items-center gap-1">
+            <Wardy mood="happy" size={44} outfit={o} />
+            <span className="text-caption text-text-muted">{o}</span>
+          </div>
+        ))}
+      </div>
       <div className="flex items-end justify-around rounded-card border border-border bg-surface-1 p-4">
         {[1, 2, 4, 5, 6].map((lv) => (
           <div key={lv} className="flex flex-col items-center gap-1">

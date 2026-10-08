@@ -18,7 +18,7 @@ export interface KV {
 }
 
 function upstash(): KV {
-  const r = new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! })
+  const r = new Redis({ url: KV_URL!, token: KV_TOKEN! })
   return {
     get: (k) => r.get(k),
     async set(k, v, o) {
@@ -109,6 +109,9 @@ function memory(): KV {
   }
 }
 
+// Upstash's own names, or the ones its Vercel Marketplace integration creates.
+const KV_URL = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL
+const KV_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN
 const g = globalThis as unknown as { __kv?: KV }
 export const kv: KV =
-  g.__kv ?? (g.__kv = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN ? upstash() : memory())
+  g.__kv ?? (g.__kv = KV_URL && KV_TOKEN ? upstash() : memory())

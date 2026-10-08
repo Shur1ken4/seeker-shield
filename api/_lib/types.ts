@@ -93,7 +93,12 @@ export interface WardyState {
   rewards: number
   /** Paid the one-time adoption. Only present on GET /api/wardy. */
   adopted?: boolean
+  /** The look chosen at adoption; null until chosen. Permanent once set. Only present on GET /api/wardy. */
+  outfit?: OutfitId | null
 }
+
+export const OUTFIT_IDS = ['classic', 'cap', 'party', 'headphones', 'shades', 'wizard', 'scarf'] as const
+export type OutfitId = (typeof OUTFIT_IDS)[number]
 
 /** What a streak chest holds (see api/_lib/wardy.ts). */
 export type ChestPrize = { kind: 'pro'; days: number } | { kind: 'xp'; xp: number }

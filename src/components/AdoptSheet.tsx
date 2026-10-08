@@ -9,11 +9,12 @@ import { Button } from './Button'
 import { Sheet } from './Sheet'
 import { Spinner } from './Spinner'
 import { Wardy } from './Wardy'
+import { LookPicker } from './LookPicker'
 
 type Step = 'info' | 'paying' | 'verifying' | 'done'
 
 /** One-time "Adopt Wardy": a small SKR payment that unlocks the pet, patrols, streaks and alerts. */
-export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClose: () => void; onAdopted: () => void }) {
+export function AdoptSheet({ open, onClose, onAdopted, onLookChosen }: { open: boolean; onClose: () => void; onAdopted: () => void; onLookChosen?: () => void }) {
   const { connection } = useConnection()
   const { publicKey, sendTransaction } = useWallet()
   const { hasSession, signIn } = useSession()
@@ -70,11 +71,13 @@ export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClos
   }
 
   return (
-    <Sheet open={open} onClose={() => step !== 'paying' && step !== 'verifying' && onClose()} title={step === 'done' ? 'Wardy is yours' : 'Adopt Wardy'}>
+    <Sheet open={open} onClose={() => step !== 'paying' && step !== 'verifying' && onClose()} title={step === 'done' ? 'Wardy is yours!' : 'Adopt Wardy'}>
       <div className="space-y-4">
+        {step !== 'done' && (
         <div className="flex justify-center py-2">
-          <Wardy mood={step === 'done' ? 'happy' : step === 'info' ? 'calm' : 'eating'} size={80} />
+          <Wardy mood={step === 'info' ? 'calm' : 'eating'} size={80} />
         </div>
+        )}
 
         {step === 'info' && (
           <>
@@ -116,10 +119,13 @@ export function AdoptSheet({ open, onClose, onAdopted }: { open: boolean; onClos
 
         {step === 'done' && (
           <>
-            <p className="text-center text-body">He’s on patrol. Come back tomorrow to keep him fed.</p>
-            <Button className="w-full" onClick={onClose}>
-              Done
-            </Button>
+            <p className="text-center text-body">Choose his look.</p>
+            <LookPicker
+              onChosen={() => {
+                onLookChosen?.()
+                onClose()
+              }}
+            />
           </>
         )}
 

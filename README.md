@@ -47,6 +47,7 @@ Security apps get opened once and forgotten. Wardy is a small shield character w
 - **He naps, never dies:** miss a day and he's asleep when you return, no guilt. The streak restarts; XP is never taken away.
 - **Streak chests:** every 7th day of your streak, Wardy finds a chest: a random prize of Pro days or an XP boost. Earned, never bought.
 - **He nudges you:** if you haven't patrolled by evening, Wardy sends one Telegram reminder to keep your streak.
+- **His look is yours:** when you adopt him you pick his outfit (cap, party hat, headphones, shades, wizard hat, or the Seeker scarf for Genesis Token holders). You choose once; it's his for good, so every Wardy is a little different.
 - **He grows:** Pup, Scout, Guard, Knight, Sentinel, Legend. Cosmetic only; levels never change what's checked or allowed.
 
 ## How Wardy makes money (paid in SKR)
@@ -66,7 +67,7 @@ For comparison: Revoke.cash charges $1.50 per batch revoke and $99 a year for Pr
 - **Mobile Wallet Adapter**, through `@solana-mobile/wallet-standard-mobile` registered as a Wallet Standard wallet, so the Seed Vault Wallet connects natively.
 - **Seed Vault signing**: every fix and payment is one fingerprint approval, and multi-transaction fixes are signed as one batch.
 - **Seeker Genesis Token verification**: Sign In With Solana, then the official on-chain check (skip empty accounts; check metadata pointer and group membership; record the SGT mint).
-- **SKR payments**: Wardy Pro costs 250 SKR for 30 days, sent as a plain transfer and verified on-chain by the server. Seeker Verified users get their first month free, once per Genesis Token.
+- **SKR payments**: Adopting Wardy costs 50 SKR once and Wardy Pro 150 SKR for 30 days, each sent as a plain transfer and verified on-chain by the server. Seeker Verified users get their first month of Pro free, once per Genesis Token.
 - **`.skr` names**: add a friend by `alice.skr`; your own name shows on Profile.
 - **`webshell` packaging**: the Android app is built with `npx solana-mobile webshell`, not a Trusted Web Activity, so wallet intents work inside the app.
 

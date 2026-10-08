@@ -77,7 +77,7 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: 
 
       {wardy.state && (
         <div className="flex items-center gap-4 rounded-card border border-border bg-surface-1 p-4">
-          <Wardy mood={wardy.state.sleepy ? 'sleepy' : 'happy'} size={72} level={wardy.state.level} />
+          <Wardy mood={wardy.state.sleepy ? 'sleepy' : 'happy'} size={72} level={wardy.state.level} outfit={wardy.state.outfit ?? 'classic'} />
           <div className="min-w-0 flex-1">
             <p className="font-brand text-title font-extrabold">Wardy</p>
             <p className="text-body-sm text-text-secondary">

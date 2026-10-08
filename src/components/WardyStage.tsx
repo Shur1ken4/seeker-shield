@@ -3,6 +3,7 @@ import { BellRing, Check, Flame, Lock, Sparkles, TrendingUp, Utensils } from 'lu
 import { cn } from '@/lib/cn'
 import { Button } from './Button'
 import { Wardy, type WardyMood } from './Wardy'
+import type { OutfitId } from '@/lib/outfits'
 import type { WardyState } from '../../api/_lib/types'
 
 const TAP_LINES = ['Boop!', 'On patrol!', 'Hehe.', 'All eyes on your wallet.', 'Nothing gets past me.']
@@ -32,10 +33,11 @@ interface Props {
   unlockPrice?: number
   /** Smaller stage when Wardy plays a supporting role on the screen. */
   compact?: boolean
+  outfit?: OutfitId
 }
 
 /** The pet: tap him, rub him, feed him. He looks at your finger and reacts. */
-export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, feeding, onUnlock, unlocking, unlockPrice, compact }: Props) {
+export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, feeding, onUnlock, unlocking, unlockPrice, compact, outfit }: Props) {
   const [reaction, setReaction] = useState<{ mood: WardyMood | null; text: string | null; anim: string }>({ mood: null, text: null, anim: '' })
   const [look, setLook] = useState({ x: 0, y: 0 })
   const [hearts, setHearts] = useState<{ id: number; x: number }[]>([])
@@ -140,7 +142,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
               transformStyle: 'preserve-3d',
             }}
           >
-            <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} level={locked ? 1 : state?.level} />
+            <Wardy mood={shownMood} size={compact ? 100 : 124} look={locked ? undefined : look} grey={locked} level={locked ? 1 : state?.level} outfit={locked ? 'classic' : outfit} />
           </div>
         </div>
 

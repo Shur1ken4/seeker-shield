@@ -14,6 +14,8 @@ import { ScanReport } from '@/components/ScanReport'
 import { DemoPermission } from '@/components/DemoPermission'
 import { forgetWallet, useSession } from '@/lib/wallet'
 import { useWardy } from '@/lib/useWardy'
+import { LookPicker } from '@/components/LookPicker'
+import { Sheet } from '@/components/Sheet'
 import { WardyStage } from '@/components/WardyStage'
 import { PENDING_ADOPT } from '@/components/ConnectHero'
 import { AdoptSheet } from '@/components/AdoptSheet'
@@ -79,6 +81,7 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
   const toast = useToast()
   const { hasSession, signIn, signingIn } = useSession()
   const wardy = useWardy(readOnly ? null : owner)
+  const outfit = wardy.state?.outfit ?? 'classic'
   const [eating, setEating] = useState(false)
   const [gained, setGained] = useState<number | null>(null)
   const [adoptOpen, setAdoptOpen] = useState(false)
@@ -248,6 +251,7 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
           onUnlock={startAdopt}
           unlocking={signingIn}
           unlockPrice={ADOPT_PRICE_SKR}
+          outfit={outfit}
         />
       )}
 
@@ -332,7 +336,13 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
           wardy.refresh()
           toast('success', 'Wardy is yours. First patrol starting.')
         }}
+        onLookChosen={wardy.refresh}
       />
+
+      {/* Adopted before looks existed, or closed the sheet before choosing: ask once. */}
+      <Sheet open={!readOnly && adopted && wardy.state?.outfit === null && !adoptOpen} onClose={() => {}} title="Choose Wardy’s look">
+        <LookPicker onChosen={wardy.refresh} />
+      </Sheet>
 
       <BurnSheet
         finding={burnTarget}
