@@ -290,7 +290,7 @@ export function ScanPage({ onFixed, onGoToWatch }: { onFixed?: () => void; onGoT
             </h2>
             {items.map((f) => {
               const { primary, secondary } = actionsFor(f)
-              return <FindingCard key={f.id} finding={f} explanation={explanations[f.id]} primary={primary} secondary={secondary} />
+              return <FindingCard key={f.id} finding={f} explanation={explanations[f.id]} primary={primary} secondary={secondary} ownWallet={!readOnly} />
             })}
           </div>
         )

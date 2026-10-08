@@ -42,7 +42,17 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: 
   const reclaimed = Math.max(stats?.stats.reclaimedLamports ?? 0, local.reclaimedLamports)
   const fixed = Math.max(stats?.stats.fixed ?? 0, local.fixed)
 
-  if (!owner) return <EmptyState title="Connect your wallet" body="Your score history, SOL reclaimed and Pro status live here." action={<Button onClick={onGoToScan}>Go to Scan</Button>} />
+  if (!owner)
+    return (
+      <section className="space-y-4 pt-2">
+        <EmptyState title="Scan your wallet first" body="Your Wardy, his level, his chests and the money he found you live here." action={<Button onClick={onGoToScan}>Go to Scan</Button>} />
+        {onShowIntro && (
+          <button onClick={onShowIntro} className="mx-auto block min-h-tap text-body-sm text-text-muted underline underline-offset-4">
+            How Wardy works
+          </button>
+        )}
+      </section>
+    )
 
   return (
     <section className="space-y-6 pt-2">

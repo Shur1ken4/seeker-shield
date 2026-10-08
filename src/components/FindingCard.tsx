@@ -14,11 +14,11 @@ const border: Record<Finding['severity'], string> = {
   cleanup: 'border-l-cleanup',
 }
 
-const title: Record<Finding['type'], (f: Finding) => string> = {
-  delegation: (f) => `An app can still move your ${label(f)}`,
-  scam_match: (f) => (f.delegate ? `A known scammer can move your ${label(f)}` : `Linked to a known scammer: ${label(f)}`),
-  suspicious: () => 'Someone sent you a fake token',
-  empty: (f) => `Old ${label(f)} account is holding your SOL`,
+const title: Record<Finding['type'], (f: Finding, own: boolean) => string> = {
+  delegation: (f, own) => `An app can still move ${own ? 'your' : 'their'} ${label(f)}`,
+  scam_match: (f, own) => (f.delegate ? `A known scammer can move ${own ? 'your' : 'their'} ${label(f)}` : `Linked to a known scammer: ${label(f)}`),
+  suspicious: (_f, own) => (own ? 'Someone sent you a fake token' : 'Someone sent them a fake token'),
+  empty: (f, own) => `Old ${label(f)} account is holding ${own ? 'your' : 'their'} SOL`,
 }
 
 function label(f: Finding) {
@@ -40,6 +40,7 @@ export function FindingCard({
   secondary,
   busy,
   showChip = false,
+  ownWallet = true,
 }: {
   finding: Finding
   explanation?: string
@@ -48,6 +49,8 @@ export function FindingCard({
   busy?: boolean
   /** Off on the Scan tab, where the group heading already says Fix now / Check this / Tidy up. */
   showChip?: boolean
+  /** False when viewing a friend's wallet, so titles say "their" instead of "your". */
+  ownWallet?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const chip: ChipKind = finding.type === 'suspicious' ? 'suspicious' : finding.severity
@@ -69,7 +72,7 @@ export function FindingCard({
         <TokenAvatar src={finding.raw.jupiterVerified === true ? finding.image : null} label={finding.symbol || finding.name || finding.mint} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="min-w-0 break-words text-body font-medium">{title[finding.type](finding)}</h3>
+            <h3 className="min-w-0 break-words text-body font-medium">{title[finding.type](finding, ownWallet)}</h3>
             {showChip && <SeverityChip kind={chip} />}
           </div>
           {explanation ? (
