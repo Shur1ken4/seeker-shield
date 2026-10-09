@@ -37,12 +37,21 @@
   --text-primary: 17 20 18;
   --text-secondary: 77 85 79;
   --text-muted: 123 131 125;
-  --safe: 21 146 94;
+  --safe: 52 211 140; /* the bright brand green for fills: Wardy, buttons, bars */
   --critical: 201 54 43;
   --warning: 168 111 0;
   --cleanup: 86 104 122;
   --on-safe: 11 13 12;
   color-scheme: light;
+}
+
+/* Bright green is too faint for text on white, so green text gets a deeper shade in light mode. */
+:root[data-theme='light'] .text-safe {
+  color: rgb(14 138 85);
+}
+/* ...but drawn shapes (the score ring) keep the bright brand green. */
+:root[data-theme='light'] .text-safe.stroke-current {
+  color: rgb(var(--safe));
 }
 
 html,
