@@ -19,6 +19,7 @@ import { WardyStage } from '@/components/WardyStage'
 import { PENDING_ADOPT } from '@/components/ConnectHero'
 import { AdoptSheet } from '@/components/AdoptSheet'
 import { ScanProgress } from '@/components/ScanProgress'
+import { ScanShow } from '@/components/ScanShow'
 import { ChestSheet } from '@/components/ChestSheet'
 import type { ChestPrize } from '../../api/_lib/types'
 import { moodForScore, type WardyMood } from '@/components/Wardy'
@@ -161,6 +162,12 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
   useEffect(() => setRevealed(false), [owner])
   const showProgress = !error && (loading || (!!data && !revealed))
   const onProgressDone = useCallback(() => setRevealed(true), [])
+  // The full-screen show plays on the first scan of each wallet per visit; later scans use the small one.
+  const [shownBig, setShownBig] = useState<Set<string | null>>(() => new Set())
+  const onBigDone = useCallback(() => {
+    setShownBig((s) => new Set(s).add(owner))
+    setRevealed(true)
+  }, [owner])
 
   const visible = useMemo(() => data?.findings.filter((f) => !hidden.has(f.mint)) ?? [], [data, hidden])
   const hiddenCount = (data?.findings.length ?? 0) - visible.length
@@ -205,8 +212,12 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
         </Button>
       </div>
 
+      {showProgress && !shownBig.has(owner) && (
+        <ScanShow key={`show-${owner}`} finished={!loading && !!data} onDone={onBigDone} readOnly={readOnly} outfit={readOnly ? 'classic' : outfit} level={readOnly ? 1 : wardy.state?.level} />
+      )}
       {showProgress ? (
-        <ScanProgress key={owner} finished={!loading && !!data} onDone={onProgressDone} readOnly={readOnly} />
+        // While the full-screen show plays, it alone decides when results appear.
+        shownBig.has(owner) ? <ScanProgress key={`progress-${owner}`} finished={!loading && !!data} onDone={onProgressDone} readOnly={readOnly} /> : null
       ) : data ? (
         readOnly ? (
           <div className="space-y-3">
