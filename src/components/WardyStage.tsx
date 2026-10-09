@@ -206,12 +206,12 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
             {state.patrolledToday ? (
               <div className="rounded-chip bg-surface-2 px-3 py-2 text-center">
                 <p className="flex items-center justify-center gap-1 text-body-sm text-safe">
-                  <Check size={16} aria-hidden /> Fed with today’s scan
+                  <Check size={16} aria-hidden /> Fed for today
                 </p>
                 {/* The reason to come back, spelled out. */}
+                <p className="mt-1 text-body-sm text-text-primary">Scan again tomorrow to keep your 🔥 {state.streak}-day streak</p>
                 <p className="mt-0.5 text-caption text-text-secondary">
-                  Tomorrow: {state.streak + 1}-day streak
-                  {state.daysToReward - 1 <= 0 ? ' and a chest' : ` · chest in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
+                  {state.daysToReward - 1 <= 0 ? '🎁 Tomorrow’s scan opens a treasure chest!' : `🎁 Treasure chest in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
                 </p>
               </div>
             ) : (
