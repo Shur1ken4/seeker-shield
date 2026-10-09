@@ -14,7 +14,7 @@ const STOPS = [
   { emoji: '🪙', label: 'Stuck SOL', obj: { x: -110, y: 85 }, at: { x: -25, y: 20 }, look: { x: -1, y: 0.8 }, line: 'Any SOL stuck in old accounts?' },
   { emoji: '🕵️', label: 'Scammers', obj: { x: 110, y: 85 }, at: { x: 25, y: 20 }, look: { x: 1, y: 0.8 }, line: 'Checking the scammer list…' },
 ]
-const LINE_MS = 750
+const LINE_MS = 1150 // slow enough to read each line and feel the work
 
 type Tone = 'info' | 'ok' | 'warn' | 'crit' | 'coin' | 'score'
 interface LogLine {
@@ -103,10 +103,10 @@ export function ScanShow({
   useEffect(() => {
     if (!log.length) return
     if (shown < log.length) {
-      const t = window.setTimeout(() => setShown((n) => n + 1), shown === 0 ? 400 : LINE_MS)
+      const t = window.setTimeout(() => setShown((n) => n + 1), shown === 0 ? 900 : LINE_MS)
       return () => window.clearTimeout(t)
     }
-    const t = window.setTimeout(onDone, 1600)
+    const t = window.setTimeout(onDone, 2400)
     return () => window.clearTimeout(t)
   }, [log, shown, onDone])
 

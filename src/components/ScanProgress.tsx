@@ -10,7 +10,7 @@ const STEPS = [
   { emoji: '🪙', text: 'Looking for SOL stuck in old accounts' },
   { emoji: '🕵️', text: 'Comparing with known scammers' },
 ]
-const STEP_MS = 1100 // slow on purpose: people should feel each check happen
+const STEP_MS = 1600 // slow on purpose: people should feel each check happen
 
 /**
  * Shows the scan as it happens: each check ticks off in turn, so people see what Wardy actually looks at.
