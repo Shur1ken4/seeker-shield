@@ -280,11 +280,7 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
           title="You’re all clear"
           body={readOnly ? 'Nothing in this wallet needs fixing right now.' : adopted ? 'Nothing needs fixing. Wardy will tell you if that changes.' : 'Nothing needs fixing right now.'}
           action={
-            readOnly ? (
-              <Button variant="secondary" onClick={rescan} loading={loading}>
-                Scan again
-              </Button>
-            ) : adopted && onGoToWatch ? (
+            !readOnly && adopted && onGoToWatch ? (
               <Button variant="secondary" onClick={onGoToWatch}>Turn on alerts</Button>
             ) : undefined
           }
@@ -342,11 +338,9 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
               </>
             )}
           </span>
-          {visible.length > 0 && (
-            <Button size="sm" variant="ghost" onClick={rescan} loading={loading}>
-              <RefreshCw size={16} aria-hidden /> Scan again
-            </Button>
-          )}
+          <Button size="sm" variant="secondary" onClick={rescan} loading={loading}>
+            <RefreshCw size={16} aria-hidden /> Scan again
+          </Button>
         </div>
       )}
 
