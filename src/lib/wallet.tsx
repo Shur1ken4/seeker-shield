@@ -131,6 +131,8 @@ interface SessionCtx extends SessionState {
   signingIn: boolean
   /** Prove wallet ownership with a free signature, then check for a Seeker Genesis Token. */
   signIn: () => Promise<SessionState>
+  /** Fetch the sign-in message early, so a later tap can open the wallet immediately. */
+  prepareSignIn: () => Promise<void>
   /** True when we hold a session for the connected wallet. */
   hasSession: boolean
 }
@@ -151,11 +153,27 @@ function SessionProvider({ children }: { children: ReactNode }) {
       .catch(() => {})
   }, [])
 
+  // Android only opens the wallet straight from a tap. Waiting on the network first can lose that,
+  // so the sign-in message is fetched ahead of time (prepareSignIn) and the tap goes right to the wallet.
+  const prepared = useRef<{ address: string; message: string; ticket: string; at: number } | null>(null)
+  const prepareSignIn = useCallback(async () => {
+    if (!address) return
+    const p = prepared.current
+    if (p && p.address === address && Date.now() - p.at < 4 * 60_000) return
+    const r = await api.get<{ message: string; ticket: string }>(`/api/auth/nonce?address=${address}`).catch(() => null)
+    if (r) prepared.current = { address, ...r, at: Date.now() }
+  }, [address])
+
   const signIn = useCallback(async () => {
     if (!address || !signMessage) throw new Error('Connect your wallet first.')
     setSigningIn(true)
     try {
-      const { message, ticket } = await api.get<{ message: string; ticket: string }>(`/api/auth/nonce?address=${address}`)
+      const p = prepared.current
+      prepared.current = null // one use only
+      const { message, ticket } =
+        p && p.address === address && Date.now() - p.at < 4 * 60_000
+          ? p
+          : await api.get<{ message: string; ticket: string }>(`/api/auth/nonce?address=${address}`)
       let signature: Uint8Array
       try {
         signature = await signMessage(new TextEncoder().encode(message))
@@ -174,10 +192,23 @@ function SessionProvider({ children }: { children: ReactNode }) {
       return next
     } finally {
       setSigningIn(false)
+      prepareSignIn() // ready for another try straight away
     }
-  }, [address, signMessage])
+  }, [address, signMessage, prepareSignIn])
 
-  const value: SessionCtx = { ...state, signingIn, signIn, hasSession: !!address && state.address === address }
+  // Keep a fresh sign-in message ready whenever a wallet is connected without a session.
+  const signedIn = !!address && state.address === address
+  useEffect(() => {
+    if (!address || signedIn) return
+    prepareSignIn()
+    const t = window.setInterval(() => {
+      prepared.current = null
+      prepareSignIn()
+    }, 3.5 * 60_000)
+    return () => window.clearInterval(t)
+  }, [address, signedIn, prepareSignIn])
+
+  const value: SessionCtx = { ...state, signingIn, signIn, prepareSignIn, hasSession: !!address && state.address === address }
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
