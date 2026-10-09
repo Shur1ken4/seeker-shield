@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
-import { BellRing, Check, Flame, Lock, Sparkles, TrendingUp, Utensils } from 'lucide-react'
+import { Check, Flame, Lock, Sparkles, Utensils } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { Button } from './Button'
 import { Wardy, type WardyMood } from './Wardy'
+import { UNLOCK_BENEFITS, UNLOCK_SOL } from '@/lib/price'
 import type { OutfitId } from '@/lib/outfits'
 import type { WardyState } from '../../api/_lib/types'
 
@@ -30,14 +31,15 @@ interface Props {
   feeding?: boolean
   onUnlock?: () => void
   unlocking?: boolean
-  unlockPrice?: number
+  /** Kept for callers; the price shown comes from src/lib/price. */
+  unlockPrice?: unknown
   /** Smaller stage when Wardy plays a supporting role on the screen. */
   compact?: boolean
   outfit?: OutfitId
 }
 
 /** The pet: tap him, rub him, feed him. He looks at your finger and reacts. */
-export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, feeding, onUnlock, unlocking, unlockPrice, compact, outfit }: Props) {
+export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, feeding, onUnlock, unlocking, compact, outfit }: Props) {
   const [reaction, setReaction] = useState<{ mood: WardyMood | null; text: string | null; anim: string }>({ mood: null, text: null, anim: '' })
   const [look, setLook] = useState({ x: 0, y: 0 })
   const [hearts, setHearts] = useState<{ id: number; x: number }[]>([])
@@ -186,20 +188,16 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
             </div>
           </div>
           <ul className="space-y-1.5 text-body-sm">
-            {[
-              { icon: BellRing, text: 'Telegram alert if something lands' },
-              { icon: Flame, text: 'Streak chests every 7 days' },
-              { icon: TrendingUp, text: 'He grows as your wallet stays safe' },
-            ].map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-2 text-text-secondary">
-                <Icon size={16} className="shrink-0 text-safe" aria-hidden /> {text}
+            {UNLOCK_BENEFITS.map((b) => (
+              <li key={b.text} className="flex items-center gap-2 text-text-secondary">
+                <span aria-hidden>{b.emoji}</span> {b.text}
               </li>
             ))}
           </ul>
           <Button className="w-full" variant="reward" onClick={onUnlock} loading={unlocking}>
-            <Sparkles size={18} aria-hidden /> Unlock Wardy · {unlockPrice} SKR
+            <Sparkles size={18} aria-hidden /> Unlock Wardy · {UNLOCK_SOL}
           </Button>
-          <p className="text-center text-caption text-text-muted">One time, about $0.90.</p>
+          <p className="text-center text-caption text-text-muted">Once, about $0.90. No subscription.</p>
         </div>
       ) : (
         state && (

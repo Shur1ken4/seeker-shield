@@ -7,13 +7,9 @@ import type { Alert, Watched } from './types.js'
 /** Every address any user watches (their own included), i.e. the Helius webhook's address list. */
 export const ALL_WATCHED = 'watch:all'
 
+/** Unlocked Wardy: one purchase includes instant alerts and 5 friends' wallets. */
 export async function isPro(address: string) {
-  const until = await kv.get<number>(`pro:${address}`)
-  return !!until && until > Date.now()
-}
-
-export async function proUntil(address: string) {
-  return (await kv.get<number>(`pro:${address}`)) ?? null
+  return !!(await kv.get<number>(`adopted:${address}`))
 }
 
 export async function watchLimit(address: string) {

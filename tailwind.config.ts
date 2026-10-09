@@ -20,6 +20,7 @@ export default {
       warning: c('warning'),
       cleanup: c('cleanup'),
       'on-safe': c('on-safe'),
+      ink: c('ink'),
     },
     fontFamily: {
       sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],

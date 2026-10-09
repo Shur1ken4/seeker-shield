@@ -22,7 +22,7 @@ export function ChestSheet({ prize, streak, onClose }: { prize: ChestPrize | nul
     const t = window.setTimeout(() => setCanClose(true), 800)
     return () => window.clearTimeout(t)
   }, [open])
-  const label = prize?.kind === 'pro' ? `${prize.days} days of Wardy Pro` : prize ? `+${prize.xp} XP boost` : ''
+  const label = prize ? (prize.xp >= 150 ? `JACKPOT! +${prize.xp} XP` : `+${prize.xp} XP boost`) : ''
 
   const pop = () => {
     if (open) return
@@ -58,7 +58,7 @@ export function ChestSheet({ prize, streak, onClose }: { prize: ChestPrize | nul
           </svg>
           {open && (
             <span className="absolute inset-x-0 -top-7 text-center text-title font-semibold text-safe" style={{ animation: 'chest-prize 600ms ease-out forwards' }}>
-              {prize?.kind === 'pro' ? `+${prize.days} Pro days` : `+${prize?.xp ?? 0} XP`}
+              {`+${prize?.xp ?? 0} XP`}
             </span>
           )}
         </button>

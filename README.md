@@ -45,29 +45,30 @@ Security apps get opened once and forgotten. Wardy is a small shield character w
 - **Daily patrol = his meal:** opening the app runs the scan; the first patrol each day feeds him, grows his XP and keeps your streak.
 - **He eats the trash:** every fix (removed access, closed account, destroyed fake token) is a snack, verified on-chain and capped per day so self-sent spam earns nothing.
 - **He naps, never dies:** miss a day and he's asleep when you return, no guilt. The streak restarts; XP is never taken away.
-- **Streak chests:** every 7th day of your streak, Wardy finds a chest: a random prize of Pro days or an XP boost. Earned, never bought.
+- **Streak chests:** every 7th day of your streak, Wardy finds a chest: a random XP boost, with a rare jackpot. Earned, never bought.
 - **He nudges you:** if you haven't patrolled by evening, Wardy sends one Telegram reminder to keep your streak.
 - **His look is yours:** when you adopt him you pick his outfit (cap, party hat, headphones, shades, wizard hat, or the Seeker scarf for Genesis Token holders). You choose once; it's his for good, so every Wardy is a little different.
 - **He grows:** Pup, Scout, Guard, Knight, Sentinel, Legend. Cosmetic only; levels never change what's checked or allowed.
 
-## How Wardy makes money (paid in SKR)
+## How Wardy makes money
 
 | | Price | What you get |
 | --- | --- | --- |
 | Free | 0 | Scans, plain-English explanations, every fix including "Fix all" |
-| Adopt Wardy | 50 SKR once (about $0.90) | The pet, daily patrols, streaks, Telegram alerts, 2 friends' wallets |
-| Wardy Pro | 150 SKR a month (about $2.60) | Instant alerts, 5 friends' wallets, score history |
+| Unlock Wardy | 0.008 SOL once (about $0.90), or 50 SKR | Everything: the pet and his outfit, daily patrols, streak chests, instant Telegram alerts, 5 friends' wallets |
 
-**Revenue flows back to users (roadmap):** 20% of unlocks, Pro, and a future 5% fee on SOL Wardy recovers (waived with a 7-day streak or Pro) fund a Wardy Treasury pool. As it grows, streak chests start including SKR prizes and Wardy collectibles, limited to Seeker Verified wallets so bots can't farm them. Chests are earned by streaks, never purchased.
+One purchase, no subscription: the price is shown in SOL (small and familiar), and SKR is offered as the alternative way to pay. Safety itself is never paywalled; Wardy is the reason to come back, not a gate.
 
-For comparison: Revoke.cash charges $1.50 per batch revoke and $99 a year for Premium; Webacy Pro is $10 a month. Safety itself is never paywalled. Payments are plain SKR transfers to the treasury, verified on-chain by the server and redeemable once.
+**Revenue flows back to users (roadmap):** 20% of unlocks and a future 5% fee on SOL Wardy recovers (waived with a 7-day streak) fund a Wardy Treasury pool. As it grows, streak chests start including SKR prizes and Wardy collectibles, limited to Seeker Verified wallets so bots can't farm them. Chests are earned by streaks, never purchased.
+
+For comparison: Revoke.cash charges $1.50 per batch revoke and $99 a year for Premium; Webacy Pro is $10 a month. Payments are plain SOL or SKR transfers to the treasury, verified on-chain by the server and redeemable once.
 
 ## How it uses the Solana Mobile Stack
 
 - **Mobile Wallet Adapter**, through `@solana-mobile/wallet-standard-mobile` registered as a Wallet Standard wallet, so the Seed Vault Wallet connects natively.
 - **Seed Vault signing**: every fix and payment is one fingerprint approval, and multi-transaction fixes are signed as one batch.
 - **Seeker Genesis Token verification**: Sign In With Solana, then the official on-chain check (skip empty accounts; check metadata pointer and group membership; record the SGT mint).
-- **SKR payments**: Adopting Wardy costs 50 SKR once and Wardy Pro 150 SKR for 30 days, each sent as a plain transfer and verified on-chain by the server. Seeker Verified users get their first month of Pro free, once per Genesis Token.
+- **SOL and SKR payments**: unlocking Wardy costs 0.008 SOL or 50 SKR, once, sent as a plain transfer and verified on-chain by the server.
 - **`.skr` names**: add a friend by `alice.skr`; your own name shows on Profile.
 - **`webshell` packaging**: the Android app is built with `npx solana-mobile webshell`, not a Trusted Web Activity, so wallet intents work inside the app.
 
@@ -87,7 +88,7 @@ Seeker (WebView app / Chrome)          Vercel functions (/api)                  
 
 - The app never holds an API key. All Solana RPC calls go through `/api/rpc`.
 - Transactions are built and simulated in the app, signed in the Seed Vault, and sent through the proxy.
-- One Helius webhook covers every watched wallet. On activity, the server rescans that wallet, compares the result with the last scan, and alerts each watcher about new Critical or Warning findings. Pro users get alerts instantly; free users get a daily digest.
+- One Helius webhook covers every watched wallet. On activity, the server rescans that wallet, compares the result with the last scan, and alerts each watcher about new Critical or Warning findings. Unlocked users get alerts instantly.
 
 ## Safety design
 

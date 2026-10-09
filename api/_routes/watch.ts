@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Please verify your wallet first.', 401)
-  if (!(await isAdopted(s.address))) return fail('Adopt Wardy to watch friends’ wallets.', 402)
+  if (!(await isAdopted(s.address))) return fail('Unlock Wardy to watch friends’ wallets.', 402)
   const body = await readJson<{ target?: string; nickname?: string }>(req)
   const target = body?.target?.trim() ?? ''
   const nickname = (body?.nickname ?? '').trim().replace(/[<>]/g, '').slice(0, 24) || 'Friend'
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   if (list.some((w) => w.address === address)) return fail('You’re already watching that wallet.')
   const limit = await watchLimit(s.address)
   if (list.length >= limit) {
-    return fail(limit < 5 ? `Free plan watches up to ${limit} wallets. Wardy Pro raises it to 5.` : `You’re watching the maximum of ${limit} wallets.`, 403)
+    return fail(`You’re watching the maximum of ${limit} friends’ wallets.`, 403)
   }
   list.push({ address, nickname, addedAt: Date.now() })
   await setWatched(s.address, list)

@@ -6,7 +6,6 @@ export interface PatrolResult {
   state: WardyState
   gained: number
   already: boolean
-  rewardProDays: number
   napped: boolean
   levelUp: boolean
   /** The scan came back clean: Wardy got the bonus treat. */

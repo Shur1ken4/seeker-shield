@@ -7,11 +7,18 @@ import { getWatched, isPro, pushAlert, watchersOf, type Alert } from './watch.js
 import type { Finding } from './types.js'
 
 const TITLES: Record<Finding['type'], (f: Finding) => string> = {
-  delegation: (f) => `An app now has access to your ${f.symbol || 'tokens'}`,
+  delegation: (f) => `An app can now move your ${f.symbol || 'tokens'}`,
   scam_match: () => 'Linked to a known scammer',
   suspicious: () => 'Someone sent you a fake token',
   empty: () => 'Old empty account',
 }
+
+/** Wardy's voice per severity: an emoji, an opener and the call to action. */
+const VOICE = {
+  critical: { emoji: '🚨', opener: 'Paws off! I caught something dangerous', cta: '👉 Open Wardy and fix it now. One fingerprint and it’s gone.' },
+  warning: { emoji: '👀', opener: 'Sniff sniff… something new showed up', cta: '👉 Take a quick look in Wardy.' },
+  info: { emoji: '🛡️', opener: 'Wardy reporting in', cta: '' },
+} as const
 
 const appLink = (watcher: string, wallet: string) => (env.appUrl ? `${env.appUrl}/${wallet === watcher ? '' : `?check=${wallet}`}` : '')
 
@@ -28,11 +35,11 @@ export async function deliver(watcher: string, alert: Alert, { instant = false }
   if (instant || (await isPro(watcher))) {
     // At most one Telegram message per watched wallet per 10 minutes.
     if (!instant && !(await kv.set(`tg:rl:${watcher}:${alert.wallet}`, 1, { ex: 600, nx: true }))) return { telegram: false }
-    const label = alert.severity === 'critical' ? 'Fix now' : alert.severity === 'warning' ? 'Check this' : 'Heads-up'
-    const where = alert.nickname === 'Your wallet' ? 'your wallet' : escapeHtml(alert.nickname)
-    const html = `<b>Wardy found something in ${where}</b> · ${label}\n${escapeHtml(alert.title)}\n\n${escapeHtml(alert.text)}`
+    const v = VOICE[alert.severity]
+    const where = alert.nickname === 'Your wallet' ? 'your wallet' : `<b>${escapeHtml(alert.nickname)}</b>’s wallet`
+    const html = `${v.emoji} <b>${v.opener} in ${where}!</b>\n\n<b>${escapeHtml(alert.title)}</b>\n${escapeHtml(alert.text)}${v.cta ? `\n\n${v.cta}` : ''}`
     const url = appLink(watcher, alert.wallet)
-    return { telegram: await sendTelegram(chatId, html, url ? { text: 'Open Wardy', url } : undefined) }
+    return { telegram: await sendTelegram(chatId, html, url ? { text: alert.severity === 'critical' ? '🛡️ Fix it in Wardy' : '🛡️ Open Wardy', url } : undefined) }
   }
   await kv.lpush(`digest:${watcher}`, alert, 20)
   await kv.sadd('digest:users', watcher)

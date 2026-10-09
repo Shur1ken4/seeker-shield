@@ -58,10 +58,10 @@ describe('Wardy patrols', () => {
       if (res.chest) chests.push(res.chest)
       r = res.record
     }
-    expect(chests).toEqual([{ kind: 'xp', xp: 50 }])
-    expect(drawChest(0.1)).toEqual({ kind: 'pro', days: 2 })
-    expect(drawChest(0.5)).toEqual({ kind: 'pro', days: 3 })
-    expect(drawChest(0.8)).toEqual({ kind: 'pro', days: 5 })
+    expect(chests).toEqual([{ kind: 'xp', xp: 150 }])
+    expect(drawChest(0.1)).toEqual({ kind: 'xp', xp: 30 })
+    expect(drawChest(0.5)).toEqual({ kind: 'xp', xp: 50 })
+    expect(drawChest(0.8)).toEqual({ kind: 'xp', xp: 80 })
   })
 
   it('maps XP to levels', () => {

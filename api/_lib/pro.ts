@@ -1,8 +1,6 @@
-import { PRO_DAYS, SKR_MINT } from './constants.js'
+import { SKR_MINT } from './constants.js'
 import { kv } from './kv.js'
 import { rpc } from './solana.js'
-
-const DAY_MS = 24 * 60 * 60 * 1000
 
 export async function skrDecimals(): Promise<number> {
   const cached = await kv.get<number>('skr:decimals')
@@ -14,12 +12,6 @@ export async function skrDecimals(): Promise<number> {
   return d
 }
 
-export async function extendPro(address: string, days = PRO_DAYS) {
-  const current = (await kv.get<number>(`pro:${address}`)) ?? 0
-  const until = Math.max(Date.now(), current) + days * DAY_MS
-  await kv.set(`pro:${address}`, until)
-  return until
-}
 
 interface TokenBalance {
   accountIndex: number
@@ -49,6 +41,23 @@ export async function checkPayment(signature: string, payer: string, treasury: s
   }
   if (delta(treasury) < price) return `The treasury didn’t receive ${priceSkr} SKR in that transaction.`
   if (delta(payer) > -price) return 'That SKR didn’t come from your wallet.'
+  return null
+}
+
+/**
+ * Checks a SOL payment on-chain: confirmed, no error, signed by `payer`, and the treasury's
+ * balance went up by at least `lamports`. Returns null when valid, otherwise a plain-English reason.
+ */
+export async function checkSolPayment(signature: string, payer: string, treasury: string, lamports: number): Promise<string | null> {
+  const tx = await rpc<any>('getTransaction', [signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }])
+  if (!tx) return 'Payment not found yet. Wait a few seconds and try again.'
+  if (tx.meta?.err) return 'That payment failed on-chain.'
+  const keys: { pubkey: string; signer: boolean }[] = tx.transaction.message.accountKeys
+  if (!keys.some((k) => k.pubkey === payer && k.signer)) return 'That payment wasn’t signed by your wallet.'
+  const i = keys.findIndex((k) => k.pubkey === treasury)
+  if (i < 0) return 'That payment didn’t go to Wardy.'
+  const received = (tx.meta.postBalances[i] ?? 0) - (tx.meta.preBalances[i] ?? 0)
+  if (received < lamports) return `The treasury didn’t receive ${lamports / 1e9} SOL in that transaction.`
   return null
 }
 

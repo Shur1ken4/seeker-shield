@@ -42,7 +42,7 @@ export function Wardy({
 }) {
   const tone = grey || mood === 'sleepy' ? 'cleanup' : mood === 'alarmed' ? 'warning' : 'safe'
   const base = `rgb(var(--${tone}))`
-  const ink = 'fill-bg stroke-bg'
+  const ink = 'fill-ink stroke-ink' // his features stay dark in both themes
   const nx = Math.max(-1, Math.min(1, look?.x ?? 0))
   const ny = Math.max(-1, Math.min(1, look?.y ?? 0))
   const lx = nx * 6

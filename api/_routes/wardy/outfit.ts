@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Please verify your wallet first.', 401)
-  if (!(await isAdopted(s.address))) return fail('Adopt Wardy first.', 402)
+  if (!(await isAdopted(s.address))) return fail('Unlock Wardy first.', 402)
   const body = (await req.json().catch(() => null)) as { outfit?: string } | null
   const outfit = body?.outfit as OutfitId
   if (!OUTFIT_IDS.includes(outfit)) return fail('Unknown look.')

@@ -10,7 +10,7 @@ import { api } from '@/lib/api'
 import { cn } from '@/lib/cn'
 import { short, timeAgo } from '@/lib/format'
 import type { Alert, Watched } from '../../api/_lib/types'
-import { ADOPT_PRICE_SKR } from '../../api/_lib/constants'
+import { UNLOCK_SOL } from '@/lib/price'
 import { AdoptSheet } from '@/components/AdoptSheet'
 import { Wardy } from '@/components/Wardy'
 
@@ -26,7 +26,7 @@ interface WatchData {
 const band = (score: number | null) =>
   score == null ? 'text-text-muted' : score >= 90 ? 'text-safe' : score >= 70 ? 'text-cleanup' : score >= 40 ? 'text-warning' : 'text-critical'
 
-export function WatchPage({ onGoToScan, onUpgrade }: { onGoToScan: () => void; onUpgrade: () => void }) {
+export function WatchPage({ onGoToScan }: { onGoToScan: () => void }) {
   return (
     <section className="space-y-6 pt-2">
       <header>
@@ -34,13 +34,13 @@ export function WatchPage({ onGoToScan, onUpgrade }: { onGoToScan: () => void; o
         <p className="mt-1 text-body-sm text-text-secondary">Wardy keeps checking after you leave. If a fake token or new app access shows up in your wallet or a friend’s, you get a Telegram message.</p>
       </header>
       <VerifyGate why="So alerts go to you and nobody else." onGoToScan={onGoToScan}>
-        <WatchContent onUpgrade={onUpgrade} />
+        <WatchContent />
       </VerifyGate>
     </section>
   )
 }
 
-function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
+function WatchContent() {
   const [data, setData] = useState<WatchData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [linking, setLinking] = useState(false)
@@ -93,10 +93,10 @@ function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
           <div className="flex justify-center">
             <Wardy mood="calm" size={72} />
           </div>
-          <h3 className="mt-3 text-title font-semibold">Adopt Wardy to get alerts</h3>
+          <h3 className="mt-3 text-title font-semibold">Unlock Wardy to get alerts</h3>
           <p className="mt-1 text-body-sm text-text-secondary">He’ll message you on Telegram when something lands in your wallet or a friend’s.</p>
           <Button className="mt-4" onClick={() => setAdoptOpen(true)}>
-            Adopt for {ADOPT_PRICE_SKR} SKR
+            Unlock for {UNLOCK_SOL}
           </Button>
         </div>
         <AdoptSheet open={adoptOpen} onClose={() => setAdoptOpen(false)} onAdopted={load} />
@@ -121,11 +121,7 @@ function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
           <div className="flex-1">
             <p className="text-body font-medium">{data.telegram.linked ? 'Telegram connected' : 'Telegram not connected'}</p>
             <p className="text-body-sm text-text-secondary">
-              {data.telegram.linked
-                ? data.pro
-                  ? 'Alerts arrive the moment something happens.'
-                  : 'You get a daily digest. Pro sends alerts instantly.'
-                : 'Connect once, then alerts come to your Telegram.'}
+              {data.telegram.linked ? 'Alerts arrive the moment something happens.' : 'Connect once, then alerts come to your Telegram.'}
             </p>
           </div>
         </div>
@@ -141,7 +137,7 @@ function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
         </div>
       </div>
 
-      <WatchedList data={data} onChange={load} onUpgrade={onUpgrade} />
+      <WatchedList data={data} onChange={load} />
 
       <div className="space-y-3">
         <h2 className="text-body-sm font-medium text-text-secondary">Recent alerts</h2>
@@ -168,7 +164,7 @@ function WatchContent({ onUpgrade }: { onUpgrade: () => void }) {
   )
 }
 
-function WatchedList({ data, onChange, onUpgrade }: { data: WatchData; onChange: () => void; onUpgrade: () => void }) {
+function WatchedList({ data, onChange }: { data: WatchData; onChange: () => void }) {
   const [target, setTarget] = useState('')
   const [nickname, setNickname] = useState('')
   const [adding, setAdding] = useState(false)
@@ -229,14 +225,7 @@ function WatchedList({ data, onChange, onUpgrade }: { data: WatchData; onChange:
 
       {full ? (
         <div className="rounded-card border border-border bg-surface-1 p-4">
-          <p className="text-body-sm text-text-secondary">
-            {data.pro ? 'You’re watching the maximum number of wallets.' : `Free plan watches ${data.limit} wallets. Pro watches up to 5, with instant alerts.`}
-          </p>
-          {!data.pro && (
-            <Button className="mt-3" variant="secondary" onClick={onUpgrade}>
-              See Wardy Pro
-            </Button>
-          )}
+          <p className="text-body-sm text-text-secondary">You’re watching the maximum of {data.limit} friends’ wallets.</p>
         </div>
       ) : (
         <form onSubmit={add} className="space-y-2 rounded-card border border-border bg-surface-1 p-4">

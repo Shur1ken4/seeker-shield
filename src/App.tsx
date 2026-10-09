@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { BottomTabBar, type Tab } from './components/BottomTabBar'
-import { ProSheet } from './components/ProSheet'
 import { ToastProvider } from './components/Toast'
 import { TopBar } from './components/TopBar'
 import { ScanPage } from './pages/ScanPage'
@@ -13,12 +12,10 @@ const PLAYGROUND = import.meta.env.DEV && new URLSearchParams(window.location.se
 
 export function App() {
   const [tab, setTab] = useState<Tab>('scan')
-  const [proOpen, setProOpen] = useState(false)
   const [intro, setIntro] = useState(() => !PLAYGROUND && shouldShowOnboarding())
   const [refreshKey, setRefreshKey] = useState(0)
   const bump = () => setRefreshKey((k) => k + 1)
   const goScan = () => setTab('scan')
-  const upgrade = () => setProOpen(true)
 
   return (
     <ToastProvider>
@@ -30,12 +27,11 @@ export function App() {
           <div hidden={tab !== 'scan' || PLAYGROUND}>
             <ScanPage onFixed={bump} onGoToWatch={() => setTab('watch')} onShowIntro={() => setIntro(true)} />
           </div>
-          {tab === 'watch' && <WatchPage onGoToScan={goScan} onUpgrade={upgrade} key={refreshKey} />}
-          {tab === 'profile' && <ProfilePage onGoToScan={goScan} onUpgrade={upgrade} refreshKey={refreshKey} onShowIntro={() => setIntro(true)} />}
+          {tab === 'watch' && <WatchPage onGoToScan={goScan} key={refreshKey} />}
+          {tab === 'profile' && <ProfilePage onGoToScan={goScan} refreshKey={refreshKey} onShowIntro={() => setIntro(true)} />}
         </main>
       </div>
       <BottomTabBar active={tab} onChange={setTab} />
-      <ProSheet open={proOpen} onClose={() => setProOpen(false)} onChanged={bump} />
       {intro && (
         <Onboarding
           onDone={() => {

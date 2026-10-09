@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { Check, Fingerprint } from 'lucide-react'
+import { Fingerprint } from 'lucide-react'
 import { api } from '@/lib/api'
 import { confirmSignature } from '@/lib/fixes'
-import { buildProPayment, type ProInfo } from '@/lib/pro'
+import { buildProPayment, buildSolPayment, type ProInfo } from '@/lib/pro'
+import { UNLOCK_BENEFITS, UNLOCK_SKR, UNLOCK_SOL } from '@/lib/price'
 import { friendlyWalletError, useSession } from '@/lib/wallet'
 import { Button } from './Button'
 import { Sheet } from './Sheet'
@@ -12,14 +13,16 @@ import { Wardy } from './Wardy'
 import { LookPicker } from './LookPicker'
 
 type Step = 'info' | 'paying' | 'verifying' | 'done'
+type Currency = 'sol' | 'skr'
 
-/** One-time "Adopt Wardy": a small SKR payment that unlocks the pet, patrols, streaks and alerts. */
+/** One-time "Unlock Wardy", everything included. Paid in SOL by default, or SKR. */
 export function AdoptSheet({ open, onClose, onAdopted, onLookChosen }: { open: boolean; onClose: () => void; onAdopted: () => void; onLookChosen?: () => void }) {
   const { connection } = useConnection()
   const { publicKey, sendTransaction } = useWallet()
   const { hasSession, signIn } = useSession()
   const [info, setInfo] = useState<ProInfo | null>(null)
   const [step, setStep] = useState<Step>('info')
+  const [currency, setCurrency] = useState<Currency>('sol')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -45,14 +48,14 @@ export function AdoptSheet({ open, onClose, onAdopted, onLookChosen }: { open: b
         return
       }
       // Build and test-run the payment first; only then ask for the fingerprint.
-      const built = await buildProPayment(connection, publicKey, info, info.adoptPriceSkr)
+      const built = currency === 'sol' ? await buildSolPayment(connection, publicKey, info) : await buildProPayment(connection, publicKey, info)
       setStep('paying')
       const sig = await sendTransaction(built.tx, connection, { maxRetries: 3 })
       setStep('verifying')
       await confirmSignature(connection, sig, built.lastValidBlockHeight)
       for (let i = 0; i < 5; i++) {
         try {
-          await api.post('/api/pro/verify', { signature: sig, kind: 'adopt' })
+          await api.post('/api/pro/verify', { signature: sig, currency })
           break
         } catch (e) {
           if (i === 4) throw e
@@ -70,44 +73,53 @@ export function AdoptSheet({ open, onClose, onAdopted, onLookChosen }: { open: b
     }
   }
 
+  const price = currency === 'sol' ? UNLOCK_SOL : UNLOCK_SKR
+  const usd = info?.adoptPriceUsd ? `≈ $${info.adoptPriceUsd.toFixed(2)}` : '≈ $0.90'
+
   return (
-    <Sheet open={open} onClose={() => step !== 'paying' && step !== 'verifying' && onClose()} title={step === 'done' ? 'Wardy is yours!' : 'Adopt Wardy'}>
+    <Sheet open={open} onClose={() => step !== 'paying' && step !== 'verifying' && onClose()} title={step === 'done' ? 'Wardy is yours!' : 'Unlock Wardy'}>
       <div className="space-y-4">
         {step !== 'done' && (
-        <div className="flex justify-center py-2">
-          <Wardy mood={step === 'info' ? 'calm' : 'eating'} size={80} />
-        </div>
+          <div className="flex justify-center py-1">
+            <Wardy mood={step === 'info' ? 'excited' : 'eating'} size={76} />
+          </div>
         )}
 
         {step === 'info' && (
           <>
-            <p className="text-center text-body">
-              <span className="font-semibold">{info?.adoptPriceSkr ?? 50} SKR</span>
-              <span className="text-text-secondary">, one time</span>
-            </p>
-            <ul className="space-y-2 text-body-sm">
-              {['Daily patrols and streaks', 'Free Pro days every 7-day streak', 'Telegram alerts and friends’ wallets'].map((b) => (
-                <li key={b} className="flex gap-2">
-                  <Check size={18} className="shrink-0 text-safe" aria-hidden /> {b}
+            <div className="text-center">
+              <p className="font-mono text-heading font-semibold">{price}</p>
+              <p className="text-caption text-text-muted">{usd} · once, no subscription</p>
+            </div>
+            <ul className="space-y-2 rounded-card bg-surface-2 p-3 text-body-sm">
+              {UNLOCK_BENEFITS.map((b) => (
+                <li key={b.text} className="flex items-center gap-2">
+                  <span aria-hidden>{b.emoji}</span> {b.text}
                 </li>
               ))}
             </ul>
-            <p className="text-center text-caption text-text-muted">Scans and fixes stay free.</p>
+            <p className="text-center text-caption text-text-muted">Scans and fixes are always free.</p>
             {info?.testMode ? (
               <>
-                <Button className="w-full" onClick={adopt} loading={busy}>
+                <Button className="w-full" variant="reward" onClick={adopt} loading={busy}>
                   Unlock free (test mode)
                 </Button>
-                <p className="text-center text-caption text-warning">Test mode: no SKR is charged.</p>
+                <p className="text-center text-caption text-warning">Test mode: nothing is charged.</p>
               </>
             ) : (
               <>
-                <Button className="w-full" onClick={adopt} loading={busy} disabled={!info?.treasury}>
-                  <Fingerprint size={20} aria-hidden /> Adopt with fingerprint
+                <Button className="w-full" variant="reward" onClick={adopt} loading={busy} disabled={!info?.treasury}>
+                  <Fingerprint size={20} aria-hidden /> Unlock for {price}
                 </Button>
-                {info && !info.treasury && <p className="text-center text-caption text-text-muted">SKR payments open soon.</p>}
+                {info && !info.treasury && <p className="text-center text-caption text-text-muted">Payments open soon.</p>}
               </>
             )}
+            <button
+              onClick={() => setCurrency(currency === 'sol' ? 'skr' : 'sol')}
+              className="mx-auto block min-h-tap text-body-sm text-text-muted underline underline-offset-4"
+            >
+              {currency === 'sol' ? `Pay ${UNLOCK_SKR} instead` : `Pay ${UNLOCK_SOL} instead`}
+            </button>
           </>
         )}
 

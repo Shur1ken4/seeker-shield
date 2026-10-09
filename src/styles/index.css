@@ -24,25 +24,25 @@
   --warning: 245 184 65;
   --cleanup: 143 163 184;
   --on-safe: 11 13 12;
+  --ink: 11 13 12;
   color-scheme: dark;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: 246 247 245;
-    --surface-1: 255 255 255;
-    --surface-2: 238 240 236;
-    --border: 218 221 215;
-    --text-primary: 17 20 18;
-    --text-secondary: 77 85 79;
-    --text-muted: 123 131 125;
-    --safe: 21 146 94;
-    --critical: 201 54 43;
-    --warning: 168 111 0;
-    --cleanup: 86 104 122;
-    --on-safe: 11 13 12;
-    color-scheme: light;
-  }
+/* Light mode is opt-in (toggle in the top bar); dark is the default whatever the phone uses. */
+:root[data-theme='light'] {
+  --bg: 246 247 245;
+  --surface-1: 255 255 255;
+  --surface-2: 238 240 236;
+  --border: 218 221 215;
+  --text-primary: 17 20 18;
+  --text-secondary: 77 85 79;
+  --text-muted: 123 131 125;
+  --safe: 21 146 94;
+  --critical: 201 54 43;
+  --warning: 168 111 0;
+  --cleanup: 86 104 122;
+  --on-safe: 11 13 12;
+  color-scheme: light;
 }
 
 html,

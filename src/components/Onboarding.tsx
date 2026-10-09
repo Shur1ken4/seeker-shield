@@ -62,7 +62,7 @@ const SLIDES: Slide[] = [
   },
   {
     title: 'Unlock your Wardy',
-    body: 'Telegram alerts, daily patrols and rewards. 50 SKR, once.',
+    body: 'Instant alerts, daily patrols and chests. 0.008 SOL, once.',
     art: (
       <div className="relative" style={{ animation: 'intro-wake 3.5s ease-out forwards' }}>
         <Wardy mood="excited" size={128} level={2} />

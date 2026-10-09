@@ -17,8 +17,8 @@ export async function POST(req: Request) {
       wallet: s.address,
       nickname: 'Your wallet',
       severity: 'info',
-      title: 'Test alert',
-      text: 'This is what an alert looks like. When something risky lands in a wallet you watch, Wardy will tell you here.',
+      title: 'Test alert 🧪',
+      text: 'Woof! This is what my alerts look like. If anything sneaky lands in a wallet I guard, I’ll bark right here. 🐾',
     },
     { instant: true },
   )

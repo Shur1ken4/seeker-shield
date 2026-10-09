@@ -9,7 +9,6 @@ import * as r_explain from './_routes/explain.js'
 import * as r_fixes_record from './_routes/fixes/record.js'
 import * as r_health from './_routes/health.js'
 import * as r_helius_webhook from './_routes/helius-webhook.js'
-import * as r_pro_claim_free from './_routes/pro/claim-free.js'
 import * as r_pro_info from './_routes/pro/info.js'
 import * as r_pro_test_unlock from './_routes/pro/test-unlock.js'
 import * as r_pro_verify from './_routes/pro/verify.js'
@@ -35,7 +34,6 @@ const routes: Record<string, Partial<Record<string, Handler>>> = {
   'fixes/record': r_fixes_record,
   'health': r_health,
   'helius-webhook': r_helius_webhook,
-  'pro/claim-free': r_pro_claim_free,
   'pro/info': r_pro_info,
   'pro/test-unlock': r_pro_test_unlock,
   'pro/verify': r_pro_verify,

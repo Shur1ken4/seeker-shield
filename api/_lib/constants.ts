@@ -6,12 +6,14 @@ export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 export const SGT_METADATA_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te'
 export const SGT_GROUP_ADDRESS = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te'
 
-/** Wardy Pro: price in whole SKR and length in days (config values, CLAUDE.md). */
-export const PRO_PRICE_SKR = 150 // about $2.60/month: ~1/4 of Webacy, ~1/3 of Revoke Premium
-/** One-time "Adopt Wardy" (about $0.88): unlocks the pet, patrols, streaks and alerts. Scans and fixes stay free. */
+/**
+ * One-time "Unlock Wardy" (about $0.90), everything included: the pet, daily patrols, streak chests,
+ * instant Telegram alerts and 5 friends' wallets. Scans and fixes stay free. No subscription.
+ * Paid in SOL by default, or in SKR.
+ */
+export const ADOPT_PRICE_LAMPORTS = 8_000_000 // 0.008 SOL
 export const ADOPT_PRICE_SKR = 50
-export const PRO_DAYS = 30
-export const FREE_WATCH_LIMIT = 2
+export const FREE_WATCH_LIMIT = 0
 export const PRO_WATCH_LIMIT = 5
 
 export const SCAN_CACHE_SECONDS = 300

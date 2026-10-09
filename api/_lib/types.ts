@@ -101,4 +101,4 @@ export const OUTFIT_IDS = ['classic', 'cap', 'party', 'headphones', 'shades', 'w
 export type OutfitId = (typeof OUTFIT_IDS)[number]
 
 /** What a streak chest holds (see api/_lib/wardy.ts). */
-export type ChestPrize = { kind: 'pro'; days: number } | { kind: 'xp'; xp: number }
+export type ChestPrize = { kind: 'xp'; xp: number }

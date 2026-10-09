@@ -33,7 +33,7 @@ export function Playground() {
       </div>
       <ScoreBar score={96} />
       <Button variant="secondary" className="w-full" onClick={() => setChest(true)}>Preview streak chest</Button>
-      <ChestSheet prize={chest ? { kind: 'pro', days: 5 } : null} streak={7} onClose={() => setChest(false)} />
+      <ChestSheet prize={chest ? { kind: 'xp', xp: 150 } : null} streak={7} onClose={() => setChest(false)} />
       <WardyStage
         compact
         locked={false}

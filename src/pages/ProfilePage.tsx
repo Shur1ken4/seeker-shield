@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { BadgeCheck, Sparkles } from 'lucide-react'
+import { BadgeCheck } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { EmptyState } from '@/components/EmptyState'
 import { ScoreHistory } from '@/components/ScoreHistory'
 import { api } from '@/lib/api'
 import { lamportsUsd, short, sol } from '@/lib/format'
-import type { ProInfo } from '@/lib/pro'
 import { useSession } from '@/lib/wallet'
 import { readLocalStats } from '@/lib/localStats'
 import { useWardy } from '@/lib/useWardy'
@@ -19,12 +18,11 @@ interface StatsData {
   solUsd: number | null
 }
 
-export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: { onGoToScan: () => void; onUpgrade: () => void; refreshKey: number; onShowIntro?: () => void }) {
+export function ProfilePage({ onGoToScan, refreshKey, onShowIntro }: { onGoToScan: () => void; refreshKey: number; onShowIntro?: () => void }) {
   const { publicKey } = useWallet()
   const { hasSession, verified, signIn, signingIn } = useSession()
   const owner = publicKey?.toBase58()
   const [stats, setStats] = useState<StatsData | null>(null)
-  const [pro, setPro] = useState<ProInfo | null>(null)
   const [skr, setSkr] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const wardy = useWardy(owner ?? null)
@@ -32,7 +30,6 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: 
   const load = useCallback(() => {
     if (!owner) return
     api.get<StatsData>(`/api/stats?owner=${owner}`).then(setStats).catch(() => {})
-    api.get<ProInfo>('/api/pro/info').then(setPro).catch(() => {})
     api.get<{ name: string | null }>(`/api/skr?address=${owner}`).then((r) => setSkr(r.name)).catch(() => {})
   }, [owner])
   useEffect(load, [load, refreshKey, hasSession])
@@ -110,24 +107,6 @@ export function ProfilePage({ onGoToScan, onUpgrade, refreshKey, onShowIntro }: 
         <ScoreHistory points={stats?.history ?? []} />
       </div>
 
-      <div className="rounded-card border border-border bg-surface-1 p-4">
-        <div className="flex items-start gap-3">
-          <Sparkles size={20} className={pro?.proUntil ? 'text-safe' : 'text-text-muted'} aria-hidden />
-          <div className="flex-1">
-            <p className="text-body font-medium">{pro?.proUntil ? 'Wardy Pro' : 'Free plan'}</p>
-            <p className="text-body-sm text-text-secondary">
-              {pro?.proUntil
-                ? `Active until ${new Date(pro.proUntil).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}.`
-                : pro?.freeMonthAvailable
-                  ? 'Seeker Verified: your first month of Pro is free.'
-                  : `Instant alerts and 5 friends for ${pro?.priceSkr ?? 150} SKR a month.`}
-            </p>
-          </div>
-        </div>
-        <Button className="mt-4 w-full" variant={pro?.proUntil ? 'secondary' : 'primary'} onClick={onUpgrade}>
-          {pro?.proUntil ? 'Extend Pro' : pro?.freeMonthAvailable ? 'Claim free month' : 'Unlock Pro'}
-        </Button>
-      </div>
       {onShowIntro && (
         <button onClick={onShowIntro} className="mx-auto block min-h-tap text-body-sm text-text-muted underline underline-offset-4">
           How Wardy works

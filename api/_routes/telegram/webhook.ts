@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (start?.[1]) {
     const address = await kv.get<string>(`tg:code:${start[1]}`)
     if (!address) {
-      await sendTelegram(chatId, 'That link has expired. Open Wardy and tap “Connect Telegram” again.')
+      await sendTelegram(chatId, '⏳ Oops, that link went stale. Open Wardy and tap “Connect Telegram” again, I’ll be waiting! 🛡️')
       return new Response('ok')
     }
     await kv.del(`tg:code:${start[1]}`)
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     await kv.sadd('tg:users', address)
     await addWatcher(address, address) // your own wallet is always watched once Telegram is linked
     await syncHeliusWebhook().catch(() => {})
-    await sendTelegram(chatId, `Linked. Wardy will alert you here about new risks in ${address.slice(0, 4)}…${address.slice(-4)}.\n\nSend /stop to turn alerts off.`)
+    await sendTelegram(chatId, `🛡️ <b>We’re linked!</b> I’m now on guard duty for ${address.slice(0, 4)}…${address.slice(-4)}.\n\n🚨 Sneaky tokens or new app access? I’ll ping you here right away.\n🔥 Forget your daily patrol? I’ll give you a friendly nudge.\n\nSend /stop anytime to pause me.`)
   } else if (text === '/stop') {
     // Unlink every wallet that points at this chat.
     const linked = (await kv.get<string[]>(`tg:wallets:${chatId}`)) ?? []
@@ -39,9 +39,9 @@ export async function POST(req: Request) {
       await kv.srem('tg:users', a)
       await removeWatcher(a, a)
     }
-    await sendTelegram(chatId, 'Alerts are off. You can turn them on again from the app.')
+    await sendTelegram(chatId, '😴 Okay, I’m off duty. Turn me back on anytime from the app. I’ll miss you!')
   } else {
-    await sendTelegram(chatId, 'Open Wardy and tap “Connect Telegram” to link your wallet.')
+    await sendTelegram(chatId, '👋 Hi, I’m Wardy, your wallet’s guard! Open the Wardy app and tap “Connect Telegram” so I can start watching your back. 🛡️')
   }
   return new Response('ok')
 }

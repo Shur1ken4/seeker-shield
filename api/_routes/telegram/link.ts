@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   if (limited) return limited
   const s = await getSession(req)
   if (!s) return fail('Please verify your wallet first.', 401)
-  if (!(await isAdopted(s.address))) return fail('Adopt Wardy to turn on alerts.', 402)
+  if (!(await isAdopted(s.address))) return fail('Unlock Wardy to turn on alerts.', 402)
   const bot = await telegramBot()
   if (!bot) return fail('Telegram alerts aren’t set up yet.', 503)
   const code = newToken().slice(0, 24)

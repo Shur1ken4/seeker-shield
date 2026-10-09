@@ -34,7 +34,7 @@ Seeker Shield is a mobile security checkup for Solana Seeker phone owners. It sc
 - Treasury wallet (receives SKR for Pro): <TREASURY_ADDRESS>
 - Telegram bot username: <BOT_USERNAME>
 - GitHub repo: github.com/<GITHUB_USERNAME>/seeker-shield
-- PRO_PRICE_SKR = 150, ADOPT_PRICE_SKR = 50, PRO_DAYS = 30 (config values)
+- ADOPT_PRICE_LAMPORTS = 0.008 SOL or ADOPT_PRICE_SKR = 50, one-time unlock, no subscription (config values)
 
 ## Environment variables (.env.local, never committed; mirror in Vercel)
 HELIUS_API_KEY, ANTHROPIC_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_WEBHOOK_SECRET, HELIUS_WEBHOOK_SECRET, UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, TREASURY_ADDRESS, APP_URL. The browser only ever talks to /api; it never sees these.
