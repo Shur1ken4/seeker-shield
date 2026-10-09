@@ -5,7 +5,7 @@ import { Wardy } from './Wardy'
 
 // Bump the version to show an updated intro once more to everyone.
 export const ONBOARDED_KEY = 'wardy.onboarded.v2'
-const STEP_MS = 5500 // slow enough to read each slide comfortably
+const STEP_MS = 4500 // a beat longer than a story slide, so each one can be read
 
 export function shouldShowOnboarding() {
   try {
@@ -64,7 +64,7 @@ const SLIDES: Slide[] = [
     title: 'Unlock your Wardy',
     body: 'Instant alerts, daily patrols and chests. 0.008 SOL, once.',
     art: (
-      <div className="relative" style={{ animation: 'intro-wake 4.5s ease-out forwards' }}>
+      <div className="relative" style={{ animation: 'intro-wake 4s ease-out forwards' }}>
         <Wardy mood="excited" size={128} level={2} />
         <Sparkles aria-hidden size={22} className="absolute -right-6 top-0 text-safe" />
       </div>
@@ -72,7 +72,7 @@ const SLIDES: Slide[] = [
   },
 ]
 
-/** First-run intro: four story-style screens, about 22 seconds, with Back and Skip. */
+/** First-run intro: four story-style screens, about 17 seconds, with Back and Skip. */
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [i, setI] = useState(0)
   const [paused, setPaused] = useState(false)
