@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { RefreshCw, ShieldCheck, Wallet } from 'lucide-react'
 import { Button } from '@/components/Button'
@@ -7,7 +7,6 @@ import { EmptyState } from '@/components/EmptyState'
 import { FindingCard, type FindingAction } from '@/components/FindingCard'
 import { FixSheet } from '@/components/FixSheet'
 import { ScoreBar, ScoreDial } from '@/components/ScoreDial'
-import { FindingCardSkeleton } from '@/components/Skeleton'
 import { useToast } from '@/components/Toast'
 import { ConnectHero } from '@/components/ConnectHero'
 import { ScanReport } from '@/components/ScanReport'
@@ -19,9 +18,10 @@ import { Sheet } from '@/components/Sheet'
 import { WardyStage } from '@/components/WardyStage'
 import { PENDING_ADOPT } from '@/components/ConnectHero'
 import { AdoptSheet } from '@/components/AdoptSheet'
+import { ScanProgress } from '@/components/ScanProgress'
 import { ChestSheet } from '@/components/ChestSheet'
 import type { ChestPrize } from '../../api/_lib/types'
-import { Wardy, moodForScore, type WardyMood } from '@/components/Wardy'
+import { moodForScore, type WardyMood } from '@/components/Wardy'
 import { addLocalStats } from '@/lib/localStats'
 import { celebrate } from '@/lib/celebrate'
 import type { FixItem } from '@/lib/fixes'
@@ -153,6 +153,15 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
   // Just open the sheet; it signs in from the user's tap there (Android only opens the wallet from a real tap).
   const startAdopt = () => setAdoptOpen(true)
 
+  // The animated check plays on every scan you start; results appear once it has finished.
+  const [revealed, setRevealed] = useState(false)
+  useEffect(() => {
+    if (loading) setRevealed(false)
+  }, [loading])
+  useEffect(() => setRevealed(false), [owner])
+  const showProgress = !error && (loading || (!!data && !revealed))
+  const onProgressDone = useCallback(() => setRevealed(true), [])
+
   const visible = useMemo(() => data?.findings.filter((f) => !hidden.has(f.mint)) ?? [], [data, hidden])
   const hiddenCount = (data?.findings.length ?? 0) - visible.length
   const score = data ? computeScore(visible) : 0
@@ -196,15 +205,8 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
         </Button>
       </div>
 
-      {loading && !data ? (
-        <div className="flex items-center gap-5" aria-label="Scanning">
-          <div className="flex h-[156px] w-[156px] shrink-0 items-center justify-center rounded-full border-[6px] border-surface-2">
-            <Wardy mood={readOnly ? 'calm' : 'eating'} size={78} />
-          </div>
-          <div className="space-y-2">
-            <p className="text-body font-medium">{readOnly ? 'Wardy is patrolling…' : 'Wardy is eating your scan…'}</p>
-          </div>
-        </div>
+      {showProgress ? (
+        <ScanProgress key={owner} finished={!loading && !!data} onDone={onProgressDone} readOnly={readOnly} />
       ) : data ? (
         readOnly ? (
           <div className="space-y-3">
@@ -225,6 +227,8 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
       {error && !loading && (
         <EmptyState title="Scan didn’t finish" body={error} action={<Button variant="secondary" onClick={rescan}>Try again</Button>} />
       )}
+      {!showProgress && (
+        <>
 
       {data && !readOnly && fixAll.length > 0 && (
         <div className="space-y-2">
@@ -257,14 +261,6 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
 
       {data && readOnly && visible.length > 0 && (
         <p className="rounded-chip bg-surface-1 p-3 text-body-sm text-text-secondary">Read-only. Only the owner can fix these.</p>
-      )}
-
-      {loading && !data && (
-        <div className="space-y-3">
-          <FindingCardSkeleton />
-          <FindingCardSkeleton />
-          <FindingCardSkeleton />
-        </div>
       )}
 
       {data && visible.length === 0 && (
@@ -344,6 +340,9 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
       )}
 
       {!readOnly && data && <DemoPermission onDone={rescan} />}
+
+        </>
+      )}
 
       <ChestSheet prize={chest?.prize ?? null} streak={chest?.streak ?? 7} onClose={() => setChest(null)} />
 

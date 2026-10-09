@@ -33,10 +33,11 @@ export function useScan(owner: string | null) {
   }, [])
 
   const run = useCallback(
-    async (fresh = false) => {
+    // quiet: background re-checks after a fix update the data without showing the scan animation.
+    async (fresh = false, quiet = false) => {
       if (!owner) return
       const id = ++seq.current
-      setLoading(true)
+      if (!quiet) setLoading(true)
       setError(null)
       try {
         const r = await api.get<ScanResult>(`/api/scan?owner=${owner}${fresh ? '&fresh=1' : ''}`)
@@ -64,7 +65,7 @@ export function useScan(owner: string | null) {
       ids.forEach((i) => fixedAt.current.set(i, now))
       setData((d) => (d ? withoutFixed(d) : d))
       timers.current.forEach(clearTimeout)
-      timers.current = [1500, 5000, 12000].map((ms) => window.setTimeout(() => run(true), ms))
+      timers.current = [1500, 5000, 12000].map((ms) => window.setTimeout(() => run(true, true), ms))
     },
     [run, withoutFixed],
   )

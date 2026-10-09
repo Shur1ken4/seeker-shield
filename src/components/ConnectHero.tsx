@@ -37,7 +37,7 @@ export function ConnectHero({ onLookup, onShowIntro }: { onLookup: (address: str
         <p className="text-body text-text-secondary">Wardy finds risky app access, fake tokens and stuck SOL, and fixes them with one tap.</p>
         {onShowIntro && (
           <button onClick={onShowIntro} className="mx-auto inline-flex min-h-tap items-center gap-2 rounded-full border border-border px-4 text-body-sm text-text-secondary active:bg-surface-2">
-            <Play size={14} className="fill-current text-safe" aria-hidden /> How Wardy works · 15s
+            <Play size={14} className="fill-current text-safe" aria-hidden /> How Wardy works · 20s
           </button>
         )}
       </div>

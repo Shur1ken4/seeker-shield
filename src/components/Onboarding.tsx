@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Flame, Sparkles, Trash2, X } from 'lucide-react'
+import { ChevronLeft, Flame, Sparkles, Trash2, X } from 'lucide-react'
 import { Button } from './Button'
 import { Wardy } from './Wardy'
 
 // Bump the version to show an updated intro once more to everyone.
 export const ONBOARDED_KEY = 'wardy.onboarded.v2'
-const STEP_MS = 3500
+const STEP_MS = 5500 // slow enough to read each slide comfortably
 
 export function shouldShowOnboarding() {
   try {
@@ -64,7 +64,7 @@ const SLIDES: Slide[] = [
     title: 'Unlock your Wardy',
     body: 'Instant alerts, daily patrols and chests. 0.008 SOL, once.',
     art: (
-      <div className="relative" style={{ animation: 'intro-wake 3.5s ease-out forwards' }}>
+      <div className="relative" style={{ animation: 'intro-wake 4.5s ease-out forwards' }}>
         <Wardy mood="excited" size={128} level={2} />
         <Sparkles aria-hidden size={22} className="absolute -right-6 top-0 text-safe" />
       </div>
@@ -72,7 +72,7 @@ const SLIDES: Slide[] = [
   },
 ]
 
-/** First-run intro: four story-style screens, about 14 seconds, skippable. */
+/** First-run intro: four story-style screens, about 22 seconds, with Back and Skip. */
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [i, setI] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -145,13 +145,18 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         </div>
       </div>
 
-      <div className="space-y-2 px-4 pb-6">
+      <div className="flex gap-2 px-4 pb-6">
+        {i > 0 && (
+          <Button variant="secondary" onClick={() => setI((x) => Math.max(0, x - 1))} aria-label="Previous slide">
+            <ChevronLeft size={20} aria-hidden /> Back
+          </Button>
+        )}
         {last ? (
-          <Button className="w-full" onClick={finish}>
+          <Button className="flex-1" onClick={finish}>
             Get started
           </Button>
         ) : (
-          <Button className="w-full" variant="ghost" onClick={finish}>
+          <Button className="flex-1" variant="ghost" onClick={finish}>
             Skip
           </Button>
         )}
