@@ -209,9 +209,10 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
                   <Check size={16} aria-hidden /> Fed for today
                 </p>
                 {/* The reason to come back, spelled out. */}
-                <p className="mt-1 text-body-sm text-text-primary">Scan again tomorrow to keep your 🔥 {state.streak}-day streak</p>
+                <p className="mt-1 text-body-sm font-medium text-text-primary">Come back tomorrow and scan to keep your 🔥 {state.streak}-day streak</p>
                 <p className="mt-0.5 text-caption text-text-secondary">
-                  {state.daysToReward - 1 <= 0 ? '🎁 Tomorrow’s scan opens a treasure chest!' : `🎁 Treasure chest in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
+                  ⭐ Earn XP every day ·{' '}
+                  {state.daysToReward - 1 <= 0 ? '🎁 tomorrow’s scan opens a treasure chest!' : `🎁 treasure chest in ${state.daysToReward - 1} day${state.daysToReward - 1 === 1 ? '' : 's'}`}
                 </p>
               </div>
             ) : (
