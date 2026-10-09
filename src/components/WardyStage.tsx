@@ -176,17 +176,6 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
 
       {locked ? (
         <div className="space-y-3">
-          {/* The value in one glance: free means you check; Wardy checks for you. */}
-          <div className="grid grid-cols-2 gap-2 text-caption">
-            <div className="rounded-chip bg-surface-2 p-3">
-              <p className="font-medium text-text-secondary">Free</p>
-              <p className="mt-1 text-text-muted">You remember to check</p>
-            </div>
-            <div className="rounded-chip border border-safe/40 bg-safe/[.08] p-3">
-              <p className="font-medium text-safe">With Wardy</p>
-              <p className="mt-1 text-text-secondary">He checks for you</p>
-            </div>
-          </div>
           <ul className="space-y-1.5 text-body-sm">
             {UNLOCK_BENEFITS.map((b) => (
               <li key={b.text} className="flex items-center gap-2 text-text-secondary">
@@ -227,7 +216,7 @@ export function WardyStage({ locked, mood, line, state, eating, gained, onFeed, 
               </div>
             ) : (
               <Button className="w-full" onClick={onFeed} loading={feeding}>
-                <Utensils size={18} aria-hidden /> Scan & feed Wardy
+                <Utensils size={18} aria-hidden /> Feed Wardy
               </Button>
             )}
           </div>

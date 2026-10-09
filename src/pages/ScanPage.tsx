@@ -51,7 +51,7 @@ function summaryLine(findings: Finding[], readOnly: boolean) {
 
 /** Wardy's own short line, by mood. */
 function moodLine(mood: WardyMood, fed: boolean) {
-  if (!fed) return 'I’m hungry. Scan your wallet to feed me. Clean ones taste best.'
+  if (!fed) return 'Ooh, a fresh scan! Tap below to feed it to me. 🍖'
   switch (mood) {
     case 'happy':
       return 'All quiet on my patrol.'
@@ -237,7 +237,7 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
         </div>
       )}
 
-      {data && !readOnly && (
+      {data && !readOnly && visible.length === 0 && (
         <WardyStage
           compact
           locked={!!wardy.state && !adopted}
@@ -271,15 +271,15 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
         <EmptyState
           icon={<ShieldCheck size={28} aria-hidden />}
           title="You’re all clear"
-          body={readOnly ? 'Nothing in this wallet needs fixing right now.' : 'Nothing needs fixing. Turn on alerts and Wardy will tell you if that changes.'}
+          body={readOnly ? 'Nothing in this wallet needs fixing right now.' : adopted ? 'Nothing needs fixing. Wardy will tell you if that changes.' : 'Nothing needs fixing right now.'}
           action={
-            !readOnly && onGoToWatch ? (
-              <Button onClick={onGoToWatch}>Turn on alerts</Button>
-            ) : (
+            readOnly ? (
               <Button variant="secondary" onClick={rescan} loading={loading}>
                 Scan again
               </Button>
-            )
+            ) : adopted && onGoToWatch ? (
+              <Button variant="secondary" onClick={onGoToWatch}>Turn on alerts</Button>
+            ) : undefined
           }
         />
       )}
@@ -299,6 +299,25 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
           </div>
         )
       })}
+
+      {/* With problems to fix, Wardy waits below them: purpose first. */}
+      {data && !readOnly && visible.length > 0 && (
+        <WardyStage
+          compact
+          locked={!!wardy.state && !adopted}
+          mood={wardyMood(false, !!wardy.state?.sleepy && !wardy.state.patrolledToday) ?? moodForScore(score)}
+          line={moodLine(moodForScore(score), !!wardy.state?.patrolledToday)}
+          state={wardy.state}
+          eating={eating}
+          gained={gained}
+          onFeed={feed}
+          feeding={feeding}
+          onUnlock={startAdopt}
+          unlocking={signingIn}
+          unlockPrice={ADOPT_PRICE_SKR}
+          outfit={outfit}
+        />
+      )}
 
       {/* The work behind the score: open on a clean wallet, tucked below the problems otherwise. */}
       {data && <ScanReport data={data} findings={visible} defaultOpen={visible.length === 0} />}

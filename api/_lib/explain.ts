@@ -21,7 +21,7 @@ export function template(f: Pick<Finding, 'type' | 'severity' | 'symbol' | 'name
     case 'suspicious':
       return `Worthless bait to lure you to a fake website. Don’t visit it; hide it.`
     case 'empty':
-      return `Empty, but still holding a little of your SOL. Close it to get it back.`
+      return `Empty, but still holding a little SOL. Closing it sends that SOL back to the owner.`
   }
 }
 
