@@ -31,7 +31,7 @@ Seeker Shield is a mobile security checkup for Solana Seeker phone owners. It sc
 - Token Program: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
 - Token-2022 Program: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb
 - Seeker Genesis Token (SGT): Token-2022 NFT. Verify mint authority, metadata pointer, and group membership exactly as the official docs/skill describe.
-- Treasury wallet (receives SKR for Pro): <TREASURY_ADDRESS>
+- Treasury wallet (receives SOL or SKR for unlocks): <TREASURY_ADDRESS>
 - Telegram bot username: <BOT_USERNAME>
 - GitHub repo: github.com/<GITHUB_USERNAME>/seeker-shield
 - ADOPT_PRICE_LAMPORTS = 0.008 SOL or ADOPT_PRICE_SKR = 50, one-time unlock, no subscription (config values)

@@ -24,7 +24,7 @@ Seeker owners are some of the most active wallets on Solana, so they attract all
 | --- | --- |
 | **Scan** | Connect the Seed Vault Wallet and get a Safety score from 0 to 100. Findings are grouped as Critical, Warning and Cleanup, each with a one-sentence AI explanation and a fix button. "Fix all safe items" revokes and closes everything safe in as few fingerprint approvals as possible. |
 | **Watch** | Link Telegram once. Get an alert when something new and risky lands in your wallet, or in a friend's wallet you've added by address or `.skr` name. Alerts are also saved in the app. |
-| **Profile** | Seeker Verified badge (from your Genesis Token), SOL reclaimed, issues fixed, score history, and Wardy Pro. |
+| **Profile** | Seeker Verified badge (from your Genesis Token), SOL reclaimed, issues fixed, score history, and Wardy himself. |
 
 _Screenshots: add to `/docs` and link here._
 
