@@ -213,7 +213,7 @@ export function ScanPage({ onFixed, onGoToWatch, onShowIntro }: { onFixed?: () =
       </div>
 
       {showProgress && !shownBig.has(owner) && (
-        <ScanShow key={`show-${owner}`} finished={!loading && !!data} onDone={onBigDone} readOnly={readOnly} outfit={readOnly ? 'classic' : outfit} level={readOnly ? 1 : wardy.state?.level} />
+        <ScanShow key={`show-${owner}`} data={data} finished={!loading && !!data} onDone={onBigDone} readOnly={readOnly} outfit={readOnly ? 'classic' : outfit} level={readOnly ? 1 : wardy.state?.level} />
       )}
       {showProgress ? (
         // While the full-screen show plays, it alone decides when results appear.
